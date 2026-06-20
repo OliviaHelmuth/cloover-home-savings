@@ -1,29 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { Onboarding } from "@/components/cloover/Onboarding";
+import { Configurator } from "@/components/cloover/Configurator";
+import { Proposal } from "@/components/cloover/Proposal";
+import { DEFAULT_ONBOARDING, type OnboardingData } from "@/lib/cloover-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Cloover — Interactive Energy Savings Advisor" },
+      { name: "description", content: "See how much you save every month with a Cloover home energy upgrade." },
+      { property: "og:title", content: "Cloover — Interactive Energy Savings Advisor" },
+      { property: "og:description", content: "Configure solar, battery, heat pump, EV and dynamic tariff. Watch your monthly savings update live." },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+type Stage = "onboarding" | "configurator" | "proposal";
+
 function Index() {
+  const [stage, setStage] = useState<Stage>("onboarding");
+  const [data, setData] = useState<OnboardingData>(DEFAULT_ONBOARDING);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      {stage === "configurator" && <Configurator onboarding={data} onReview={() => setStage("proposal")} />}
+      {stage === "proposal" && <Proposal onBack={() => setStage("configurator")} />}
+      {stage === "onboarding" && (
+        <Onboarding
+          onComplete={(d) => {
+            setData(d);
+            setStage("configurator");
+          }}
+        />
+      )}
+    </>
   );
 }
