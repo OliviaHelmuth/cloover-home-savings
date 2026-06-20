@@ -22,8 +22,8 @@ export function Onboarding({ onComplete }: Props) {
 
   const screens = [
     <AddressScreen key="0" data={data} update={update} onNext={next} />,
-    <MapScreen key="1" drawn={data.roofDrawn} setDrawn={(v) => update({ roofDrawn: v })} onBack={back} onNext={next} />,
-    <RoofTypeScreen key="2" value={data.roofType} onChange={(v) => update({ roofType: v })} onBack={back} onNext={next} />,
+    <MapScreen key="1" drawn={data.roofDrawn} setDrawn={(v: boolean) => update({ roofDrawn: v })} onBack={back} onNext={next} />,
+    <RoofTypeScreen key="2" value={data.roofType} onChange={(v: string) => update({ roofType: v })} onBack={back} onNext={next} />,
     <PitchScreen key="3" data={data} update={update} onBack={back} onNext={next} />,
     <ConsumptionScreen key="4" data={data} update={update} onBack={back} onNext={next} />,
     <YearlyScreen key="5" data={data} update={update} monthlyCost={monthlyCost} onBack={back} onNext={next} />,
