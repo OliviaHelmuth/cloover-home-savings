@@ -14,11 +14,12 @@ const ASSETS = {
 export function HouseScene({ active }: Props) {
   const has = (k: ModuleKey) => active.has(k);
   const hasElectricity = has("solar");
+  const hasBattery = has("battery");
   const hasHeating = has("heatpump");
   const hasMobility = has("ev");
 
   return (
-    <svg viewBox="0 0 720 480" className="w-full h-full max-h-[520px]" role="img">
+    <svg viewBox="0 0 720 480" className="h-full w-full" role="img">
       <title>Home with electricity, heating, and mobility upgrades</title>
       <defs>
         <linearGradient id="imageSceneSky" x1="0" y1="0" x2="1" y2="1">
@@ -50,13 +51,13 @@ export function HouseScene({ active }: Props) {
         <ellipse cx="133" cy="84" rx="48" ry="24" fill="#fff" opacity="0.45" />
       </g>
 
-      <g className="cute-price-pill" filter="url(#imageSoftShadow)">
+      {/* <g className="cute-price-pill" filter="url(#imageSoftShadow)">
         <rect x="548" y="36" width="112" height="45" rx="13" fill="#ffffff" />
         <circle cx="574" cy="58" r="8" fill="#002EFF" />
         <text x="592" y="65" fontSize="22" fontWeight="800" fill="#252a36">
           7.24 ct
         </text>
-      </g>
+      </g> */}
 
       <g className="cute-float-slow" opacity="0.95" filter="url(#imageSoftShadow)">
         <image
@@ -69,26 +70,24 @@ export function HouseScene({ active }: Props) {
         />
       </g>
 
-      {(hasElectricity || hasHeating || hasMobility) && (
-        <g>
-          <path
-            d="M98 398 C 224 354 346 340 466 358 C 548 370 580 285 631 190"
-            fill="none"
-            stroke="#355b62"
-            strokeWidth="4"
-            strokeLinecap="round"
-            opacity="0.62"
-          />
-          <path
-            d="M98 398 C 224 354 346 340 466 358 C 548 370 580 285 631 190"
-            fill="none"
-            stroke="#7CFF30"
-            strokeWidth="5"
-            strokeLinecap="round"
-            className="cute-flow"
-          />
-        </g>
-      )}
+      <g id="grid-line">
+        <path
+          d="M630 188 C590 238 540 286 486 314 C438 338 382 336 330 318"
+          fill="none"
+          stroke="#355b62"
+          strokeWidth="4"
+          strokeLinecap="round"
+          opacity="0.58"
+        />
+        <path
+          d="M630 188 C590 238 540 286 486 314 C438 338 382 336 330 318"
+          fill="none"
+          stroke="#7CFF30"
+          strokeWidth="5"
+          strokeLinecap="round"
+          className="cute-flow"
+        />
+      </g>
 
       <g className="cute-house-bob" filter="url(#imageSoftShadow)">
         <image
@@ -112,13 +111,18 @@ export function HouseScene({ active }: Props) {
             preserveAspectRatio="xMidYMid meet"
           />
           <path
-            d="M198 178 C220 228 248 278 306 328"
+            d="M198 172 C232 206 258 248 300 292"
             fill="none"
             stroke="#7CFF30"
             strokeWidth="5"
             strokeLinecap="round"
             className="cute-flow"
           />
+        </g>
+      )}
+
+      {hasBattery && (
+        <g id="battery-probe" className="anim-pop" filter="url(#imageSoftShadow)">
           <image
             href={ASSETS.battery}
             x="490"
@@ -128,7 +132,7 @@ export function HouseScene({ active }: Props) {
             preserveAspectRatio="xMidYMid meet"
           />
           <path
-            d="M496 338 C468 326 432 313 388 308"
+            d="M500 334 C458 330 410 318 360 304"
             fill="none"
             stroke="#7CFF30"
             strokeWidth="5"
@@ -149,7 +153,7 @@ export function HouseScene({ active }: Props) {
             preserveAspectRatio="xMidYMid meet"
           />
           <path
-            d="M145 390 C202 382 244 360 294 338"
+            d="M142 386 C190 374 240 348 292 318"
             fill="none"
             stroke="#7CFF30"
             strokeWidth="5"
@@ -170,7 +174,7 @@ export function HouseScene({ active }: Props) {
             preserveAspectRatio="xMidYMid meet"
           />
           <path
-            d="M606 382 C614 322 626 250 640 190"
+            d="M590 382 C548 356 494 336 436 322"
             fill="none"
             stroke="#7CFF30"
             strokeWidth="5"

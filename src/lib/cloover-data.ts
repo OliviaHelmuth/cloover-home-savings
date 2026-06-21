@@ -19,7 +19,7 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
 
 export const MODULE_SAVINGS: Record<ModuleKey, number> = {
   solar: 106,
-  battery: 0,
+  battery: 10,
   tariff: 0,
   heatpump: 43,
   ev: 7,
@@ -34,7 +34,7 @@ export const CURRENT_COSTS = {
   total: 570,
 };
 
-export const MAX_SAVING = 156;
+export const MAX_SAVING = 166;
 export const PLAN_INSTALLMENT_BASE = 150;
 
 export type Scenario = {
@@ -47,8 +47,9 @@ export type Scenario = {
 export const SCENARIOS: Scenario[] = [
   { modules: [], cloover: 570, saving: 0, fit: 0 },
   { modules: ["solar"], cloover: 464, saving: 106, fit: 85 },
-  { modules: ["solar", "heatpump"], cloover: 421, saving: 149, fit: 92 },
-  { modules: ["solar", "heatpump", "ev"], cloover: 414, saving: 156, fit: 89 },
+  { modules: ["solar", "battery"], cloover: 454, saving: 116, fit: 88 },
+  { modules: ["solar", "battery", "heatpump"], cloover: 411, saving: 159, fit: 94 },
+  { modules: ["solar", "battery", "heatpump", "ev"], cloover: 404, saving: 166, fit: 92 },
 ];
 
 export function computeScenario(active: Set<ModuleKey>) {
@@ -121,6 +122,19 @@ export type HouseholdInputs = {
   householdSize: number;
   yearlyEnergyConsumption: number;
 };
+
+export function getBaselineModules(
+  inputs: Pick<HouseholdInputs, "heatingType" | "carType">,
+): Set<ModuleKey> {
+  const baseline = new Set<ModuleKey>();
+  if (inputs.heatingType === "Heat Pump") {
+    baseline.add("heatpump");
+  }
+  if (inputs.carType === "EV") {
+    baseline.add("ev");
+  }
+  return baseline;
+}
 
 export const DEFAULT_HOUSEHOLD_INPUTS: HouseholdInputs = {
   street: "Friedrichstraße",

@@ -5,10 +5,9 @@ import { Onboarding } from "@/components/cloover/Onboarding";
 import { Configurator } from "@/components/cloover/Configurator";
 import { Proposal } from "@/components/cloover/Proposal";
 import {
-  DEFAULT_ONBOARDING,
   DEFAULT_HOUSEHOLD_INPUTS,
+  getBaselineModules,
   type ModuleKey,
-  type OnboardingData,
   type HouseholdInputs,
 } from "@/lib/cloover-data";
 
@@ -53,10 +52,9 @@ function Index() {
   const search = Route.useSearch();
   const step = search.step ?? "landing";
   const navigate = Route.useNavigate();
-  const [data, setData] = useState<OnboardingData>(DEFAULT_ONBOARDING);
   const [householdInputs, setHouseholdInputs] = useState<HouseholdInputs>(DEFAULT_HOUSEHOLD_INPUTS);
   const [activeModules, setActiveModules] = useState<Set<ModuleKey>>(
-    new Set<ModuleKey>(["solar", "heatpump", "ev"]),
+    getBaselineModules(DEFAULT_HOUSEHOLD_INPUTS),
   );
 
   const goTo = (nextStep: Stage) => {
@@ -105,8 +103,7 @@ function Index() {
       )}
       {step === "onboarding" && (
         <Onboarding
-          onComplete={(d) => {
-            setData(d);
+          onComplete={() => {
             goTo("configurator");
           }}
         />

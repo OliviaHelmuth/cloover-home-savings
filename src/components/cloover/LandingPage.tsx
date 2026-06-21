@@ -1,5 +1,5 @@
 import { ArrowRight, Sparkles, MapPin, Users, Gauge, Flame, Car } from "lucide-react";
-import { type ModuleKey, type HouseholdInputs } from "@/lib/cloover-data";
+import { getBaselineModules, type ModuleKey, type HouseholdInputs } from "@/lib/cloover-data";
 import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 
@@ -38,13 +38,7 @@ const HOUSEHOLD_ESTIMATES: Record<
 };
 
 export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect }: Props) {
-  const activeModules = new Set<ModuleKey>(["solar"]);
-  if (inputs.heatingType !== "Heat Pump") {
-    activeModules.add("heatpump");
-  }
-  if (inputs.carType !== "EV" && inputs.carType !== "No Car") {
-    activeModules.add("ev");
-  }
+  const activeModules = getBaselineModules(inputs);
 
   const handleCalculateClick = () => {
     onCalculate(activeModules);
@@ -57,9 +51,9 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
       street,
       ...(suggestion
         ? {
-          streetNumber: suggestion.streetNumber,
-          postalCode: suggestion.postalCode,
-        }
+            streetNumber: suggestion.streetNumber,
+            postalCode: suggestion.postalCode,
+          }
         : {}),
     });
   };
@@ -101,7 +95,8 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
               <span className="mt-3 block text-cloover">It's cheaper in the long run.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground xl:text-xl xl:leading-9">
-              The right combination of technologies can save you more than any single upgrade would. We’ll find the setup that works best for your home.
+              The right combination of technologies can save you more than any single upgrade would.
+              We’ll find the setup that works best for your home.
             </p>
           </div>
 

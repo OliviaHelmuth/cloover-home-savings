@@ -91,11 +91,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Solara — Interactive Energy Savings Advisor" },
-      { name: "description", content: "Cloover Home Savings is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades." },
-      { property: "og:description", content: "Cloover Home Savings is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades." },
-      { name: "twitter:description", content: "Cloover Home Savings is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f31ec79-d266-4286-96be-d10b7b2949a0/id-preview-06c2aad7--e82d6516-405d-440f-ae6d-db1d39d68534.lovable.app-1782004455258.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f31ec79-d266-4286-96be-d10b7b2949a0/id-preview-06c2aad7--e82d6516-405d-440f-ae6d-db1d39d68534.lovable.app-1782004455258.png" },
+      {
+        name: "description",
+        content:
+          "Solara is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Solara is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Solara is an interactive configurator that helps homeowners estimate monthly energy savings from home upgrades.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f31ec79-d266-4286-96be-d10b7b2949a0/id-preview-06c2aad7--e82d6516-405d-440f-ae6d-db1d39d68534.lovable.app-1782004455258.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2f31ec79-d266-4286-96be-d10b7b2949a0/id-preview-06c2aad7--e82d6516-405d-440f-ae6d-db1d39d68534.lovable.app-1782004455258.png",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
