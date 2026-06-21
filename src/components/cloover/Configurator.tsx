@@ -154,7 +154,7 @@ export function Configurator({
   );
   const selectedUpgradeCopy = isCurrentSetup ? "Current setup" : selectedUpgradeNames.join(" + ");
   const fitNotes = selectedOptionalModules
-    .map((module) => HOUSEHOLD_FIT[module])
+    .map((module) => HOUSEHOLD_FIT[module as keyof typeof HOUSEHOLD_FIT])
     .filter(Boolean)
     .slice(0, 2);
 
