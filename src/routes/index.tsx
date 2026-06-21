@@ -4,6 +4,7 @@ import { LandingPage } from "@/components/cloover/LandingPage";
 import { Onboarding } from "@/components/cloover/Onboarding";
 import { Configurator } from "@/components/cloover/Configurator";
 import { Proposal } from "@/components/cloover/Proposal";
+import { LoadingTransition } from "@/components/cloover/LoadingTransition";
 import {
   DEFAULT_HOUSEHOLD_INPUTS,
   getBaselineModules,
@@ -11,7 +12,13 @@ import {
   type HouseholdInputs,
 } from "@/lib/cloover-data";
 
-type Stage = "landing" | "onboarding" | "configurator" | "proposal";
+type Stage =
+  | "landing"
+  | "onboarding"
+  | "loading-configurator"
+  | "configurator"
+  | "loading-proposal"
+  | "proposal";
 
 type HomeSearch = {
   step?: Stage;
@@ -21,7 +28,9 @@ function isStage(value: unknown): value is Stage {
   return (
     value === "landing" ||
     value === "onboarding" ||
+    value === "loading-configurator" ||
     value === "configurator" ||
+    value === "loading-proposal" ||
     value === "proposal"
   );
 }
@@ -63,7 +72,7 @@ function Index() {
 
   const handleCalculate = (active: Set<ModuleKey>) => {
     setActiveModules(active);
-    goTo("configurator");
+    goTo("loading-configurator");
   };
 
   const handleStepSelect = (nextStep: 1 | 2 | 3, active = activeModules) => {
@@ -85,13 +94,39 @@ function Index() {
           onStepSelect={handleStepSelect}
         />
       )}
+      {step === "loading-configurator" && (
+        <LoadingTransition
+          title="Building your interactive house"
+          subtitle="Crunching your inputs into a live savings model"
+          steps={[
+            `Geo-locating roof at ${householdInputs.postalCode}`,
+            "Modeling solar irradiance & self-consumption",
+            "Matching dynamic tariff hours",
+            "Calibrating financing & subsidies",
+          ]}
+          onDone={() => goTo("configurator")}
+        />
+      )}
       {step === "configurator" && (
         <Configurator
           householdInputs={householdInputs}
           active={activeModules}
           onActiveChange={setActiveModules}
-          onReview={() => goTo("proposal")}
+          onReview={() => goTo("loading-proposal")}
           onStepSelect={handleStepSelect}
+        />
+      )}
+      {step === "loading-proposal" && (
+        <LoadingTransition
+          title="Compiling your savings plan"
+          subtitle="Comparing scenarios and picking the strongest upgrade path"
+          steps={[
+            "Running 5 financing scenarios",
+            "Scoring 5-year savings for each",
+            "Checking BEG & KfW subsidies",
+            "Generating advisor recommendation",
+          ]}
+          onDone={() => goTo("proposal")}
         />
       )}
       {step === "proposal" && (
@@ -104,7 +139,7 @@ function Index() {
       {step === "onboarding" && (
         <Onboarding
           onComplete={() => {
-            goTo("configurator");
+            goTo("loading-configurator");
           }}
         />
       )}
