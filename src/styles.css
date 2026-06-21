@@ -43,62 +43,198 @@
 }
 
 :root {
-  --cloover-blue: #002EFF;
-  --blue-soft: #EBEFFF;
+  --cloover-blue: #002eff;
+  --blue-soft: #ebefff;
   --ink: #000000;
-  --muted-color: #6F6F6F;
-  --line: #E9E9E9;
-  --surface: #FFFFFF;
-  --surface-soft: #F5F6F8;
-  --success: #18A058;
+  --muted-color: #6f6f6f;
+  --line: #e9e9e9;
+  --surface: #ffffff;
+  --surface-soft: #f5f6f8;
+  --success: #18a058;
 
-  --background: #FFFFFF;
+  --background: #ffffff;
   --foreground: #000000;
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #000000;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: #002EFF;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F5F6F8;
+  --primary: #002eff;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f6f8;
   --secondary-foreground: #000000;
-  --muted: #F5F6F8;
-  --muted-foreground: #6F6F6F;
-  --accent: #EBEFFF;
-  --accent-foreground: #002EFF;
-  --destructive: #E11D48;
-  --destructive-foreground: #FFFFFF;
-  --border: #E9E9E9;
-  --input: #E9E9E9;
-  --ring: #002EFF;
+  --muted: #f5f6f8;
+  --muted-foreground: #6f6f6f;
+  --accent: #ebefff;
+  --accent-foreground: #002eff;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --border: #e9e9e9;
+  --input: #e9e9e9;
+  --ring: #002eff;
 }
 
-.dark { }
+.dark {
+}
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body { background: var(--surface); color: var(--ink); font-family: var(--font-sans); }
-  body { -webkit-font-smoothing: antialiased; }
-  h1, h2, h3 { letter-spacing: -0.02em; }
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+  }
 }
 
 @keyframes slideInRoof {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 @keyframes popIn {
-  from { transform: scale(0.6); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 @keyframes energyFlow {
-  from { stroke-dashoffset: 40; }
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 @keyframes pulseBlue {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 46, 255, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(0, 46, 255, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 46, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 46, 255, 0);
+  }
 }
-.anim-roof { animation: slideInRoof 0.5s ease-out; }
-.anim-pop { animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.anim-flow { stroke-dasharray: 6 4; animation: energyFlow 1.2s linear infinite; }
-.anim-pulse-blue { animation: pulseBlue 2s ease-in-out infinite; }
+@keyframes cuteBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes cuteFloatSlow {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-6px) translateX(4px);
+  }
+}
+@keyframes cuteFlow {
+  from {
+    stroke-dashoffset: 36;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes cuteSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cutePulseScale {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.98;
+  }
+  50% {
+    transform: scale(1.025);
+    opacity: 1;
+  }
+}
+.anim-roof {
+  animation: slideInRoof 0.5s ease-out;
+}
+.anim-pop {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.anim-flow {
+  stroke-dasharray: 6 4;
+  animation: energyFlow 1.2s linear infinite;
+}
+.anim-pulse-blue {
+  animation: pulseBlue 2s ease-in-out infinite;
+}
+.cute-house-bob {
+  animation: cuteBob 4.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cute-float-slow {
+  animation: cuteFloatSlow 6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cute-flow {
+  stroke-dasharray: 12 10;
+  animation: cuteFlow 1.15s linear infinite;
+}
+.cute-spin {
+  animation: cuteSpin 6s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cute-price-pill,
+.cute-feed-card {
+  animation: cutePulseScale 3.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.premium-bg {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(0, 46, 255, 0.08), transparent 30%),
+    radial-gradient(circle at 12% 88%, rgba(0, 46, 255, 0.05), transparent 28%), var(--surface);
+}
+
+.material-field {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.material-field:focus {
+  border-color: var(--cloover-blue);
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 46, 255, 0.12);
+}

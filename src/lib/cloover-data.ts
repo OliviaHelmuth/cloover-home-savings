@@ -8,19 +8,19 @@ export type ModuleKey =
   | "tariff";
 
 export const MODULE_LABELS: Record<ModuleKey, string> = {
-  solar: "Solar panels",
+  solar: "Electricity",
   battery: "Home battery",
-  heatpump: "Heat pump",
-  ev: "EV charger",
+  heatpump: "Heating",
+  ev: "Mobility",
   boiler: "Heat pump boiler",
   electricheating: "Electric heating",
   tariff: "Dynamic tariff",
 };
 
 export const MODULE_SAVINGS: Record<ModuleKey, number> = {
-  solar: 42,
-  battery: 29,
-  tariff: 35,
+  solar: 106,
+  battery: 0,
+  tariff: 0,
   heatpump: 43,
   ev: 7,
   boiler: 6,
@@ -35,7 +35,7 @@ export const CURRENT_COSTS = {
 };
 
 export const MAX_SAVING = 156;
-export const CLOOVER_INSTALLMENT_BASE = 150;
+export const PLAN_INSTALLMENT_BASE = 150;
 
 export type Scenario = {
   modules: ModuleKey[];
@@ -46,19 +46,15 @@ export type Scenario = {
 
 export const SCENARIOS: Scenario[] = [
   { modules: [], cloover: 570, saving: 0, fit: 0 },
-  { modules: ["solar"], cloover: 528, saving: 42, fit: 68 },
-  { modules: ["solar", "battery"], cloover: 499, saving: 71, fit: 78 },
-  { modules: ["solar", "battery", "tariff"], cloover: 464, saving: 106, fit: 85 },
-  { modules: ["solar", "battery", "heatpump", "tariff"], cloover: 421, saving: 149, fit: 92 },
-  { modules: ["solar", "battery", "heatpump", "ev", "tariff"], cloover: 414, saving: 156, fit: 89 },
+  { modules: ["solar"], cloover: 464, saving: 106, fit: 85 },
+  { modules: ["solar", "heatpump"], cloover: 421, saving: 149, fit: 92 },
+  { modules: ["solar", "heatpump", "ev"], cloover: 414, saving: 156, fit: 89 },
 ];
 
 export function computeScenario(active: Set<ModuleKey>) {
   // Try exact match
   const exact = SCENARIOS.find(
-    (s) =>
-      s.modules.length === active.size &&
-      s.modules.every((m) => active.has(m)),
+    (s) => s.modules.length === active.size && s.modules.every((m) => active.has(m)),
   );
   if (exact) return exact;
 
@@ -113,3 +109,79 @@ export const DEFAULT_ONBOARDING: OnboardingData = {
   yearlyKwh: 7399,
   pricePerKwh: 0.4,
 };
+
+export type HouseholdInputs = {
+  street: string;
+  streetNumber: string;
+  postalCode: string;
+  heatingType: string;
+  monthlyHeatingSpend: number;
+  monthlyElectricitySpend: number;
+  carType: string;
+  householdSize: number;
+  yearlyEnergyConsumption: number;
+};
+
+export const DEFAULT_HOUSEHOLD_INPUTS: HouseholdInputs = {
+  street: "Friedrichstraße",
+  streetNumber: "12",
+  postalCode: "10117",
+  heatingType: "Gas",
+  monthlyHeatingSpend: 220,
+  monthlyElectricitySpend: 170,
+  carType: "Petrol/Diesel",
+  householdSize: 3,
+  yearlyEnergyConsumption: 4500,
+};
+
+export function getDynamicCosts(inputs: HouseholdInputs) {
+  const electricity = inputs.monthlyElectricitySpend;
+  const heating = inputs.heatingType === "Heat Pump" ? 0 : inputs.monthlyHeatingSpend;
+
+  let mobility = 0;
+  if (inputs.carType === "Petrol/Diesel") {
+    mobility = 180;
+  } else if (inputs.carType === "Hybrid") {
+    mobility = 120;
+  } else if (inputs.carType === "EV") {
+    mobility = 60;
+  } else {
+    mobility = 0;
+  }
+
+  const total = electricity + heating + mobility;
+  return { electricity, heating, mobility, total };
+}
+
+export function computeDynamicScenario(active: Set<ModuleKey>, inputs: HouseholdInputs) {
+  const costs = getDynamicCosts(inputs);
+
+  let saving = 0;
+  if (active.has("solar")) {
+    saving += Math.round(costs.electricity * 0.625);
+  }
+  if (active.has("heatpump") && inputs.heatingType !== "Heat Pump") {
+    saving += Math.round(costs.heating * 0.196);
+  }
+  if (active.has("ev") && inputs.carType !== "EV" && inputs.carType !== "No Car") {
+    saving += Math.round(costs.mobility * 0.04);
+  }
+
+  // Adjust for other modules if any
+  if (active.has("battery")) {
+    saving += 10;
+  }
+  if (active.has("tariff")) {
+    saving += 15;
+  }
+
+  const cloover = Math.max(costs.total - saving, 150);
+  const fit = Math.min(100, Math.max(30, 40 + active.size * 12 + inputs.householdSize * 5));
+
+  return {
+    modules: Array.from(active),
+    cloover,
+    saving,
+    fit,
+  };
+}

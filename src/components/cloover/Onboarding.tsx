@@ -5,9 +5,27 @@ import type { OnboardingData } from "@/lib/cloover-data";
 import { DEFAULT_ONBOARDING } from "@/lib/cloover-data";
 
 type Props = { onComplete: (data: OnboardingData) => void };
+type UpdateOnboarding = (patch: Partial<OnboardingData>) => void;
+type NavProps = {
+  onBack?: () => void;
+  onNext: () => void;
+};
+type DataScreenProps = NavProps & {
+  data: OnboardingData;
+  update: UpdateOnboarding;
+};
 
 const ROOF_TYPES = ["Hip roof", "Flat roof", "Gable roof", "Pyramid roof", "Shed roof"];
-const ORIENTATIONS = ["North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West"];
+const ORIENTATIONS = [
+  "North",
+  "North-East",
+  "East",
+  "South-East",
+  "South",
+  "South-West",
+  "West",
+  "North-West",
+];
 const ANGLES = ["0°", "30°", "45°", "Manual"];
 
 export function Onboarding({ onComplete }: Props) {
@@ -22,12 +40,37 @@ export function Onboarding({ onComplete }: Props) {
 
   const screens = [
     <AddressScreen key="0" data={data} update={update} onNext={next} />,
-    <MapScreen key="1" drawn={data.roofDrawn} setDrawn={(v: boolean) => update({ roofDrawn: v })} onBack={back} onNext={next} />,
-    <RoofTypeScreen key="2" value={data.roofType} onChange={(v: string) => update({ roofType: v })} onBack={back} onNext={next} />,
+    <MapScreen
+      key="1"
+      drawn={data.roofDrawn}
+      setDrawn={(v: boolean) => update({ roofDrawn: v })}
+      onBack={back}
+      onNext={next}
+    />,
+    <RoofTypeScreen
+      key="2"
+      value={data.roofType}
+      onChange={(v: string) => update({ roofType: v })}
+      onBack={back}
+      onNext={next}
+    />,
     <PitchScreen key="3" data={data} update={update} onBack={back} onNext={next} />,
     <ConsumptionScreen key="4" data={data} update={update} onBack={back} onNext={next} />,
-    <YearlyScreen key="5" data={data} update={update} monthlyCost={monthlyCost} onBack={back} onNext={next} />,
-    <SummaryScreen key="6" data={data} monthlyCost={monthlyCost} onBack={back} onNext={() => onComplete(data)} />,
+    <YearlyScreen
+      key="5"
+      data={data}
+      update={update}
+      monthlyCost={monthlyCost}
+      onBack={back}
+      onNext={next}
+    />,
+    <SummaryScreen
+      key="6"
+      data={data}
+      monthlyCost={monthlyCost}
+      onBack={back}
+      onNext={() => onComplete(data)}
+    />,
   ];
 
   return (
@@ -102,7 +145,10 @@ function FooterBtns({
       </div>
       <div className="flex gap-3">
         {onSkip && (
-          <button onClick={onSkip} className="px-6 py-3 rounded-full bg-surface-soft text-ink font-semibold hover:bg-line transition">
+          <button
+            onClick={onSkip}
+            className="px-6 py-3 rounded-full bg-surface-soft text-ink font-semibold hover:bg-line transition"
+          >
             Skip
           </button>
         )}
@@ -118,12 +164,21 @@ function FooterBtns({
   );
 }
 
-function AddressScreen({ data, update, onNext }: any) {
+function AddressScreen({
+  data,
+  update,
+  onNext,
+}: {
+  data: OnboardingData;
+  update: UpdateOnboarding;
+  onNext: () => void;
+}) {
   return (
     <div className="flex flex-col h-full">
       <Title>Calculate your roof's potential!</Title>
       <Sub>
-        In a few clicks, you can simulate the production, costs and feasibility of your home-energy upgrade.
+        In a few clicks, you can simulate the production, costs and feasibility of your home-energy
+        upgrade.
       </Sub>
       <div className="my-10 flex justify-center">
         <div className="w-24 h-24 rounded-full border-2 border-ink flex items-center justify-center">
@@ -154,20 +209,32 @@ function AddressScreen({ data, update, onNext }: any) {
   );
 }
 
-function MapScreen({ drawn, setDrawn, onBack, onNext }: any) {
+function MapScreen({
+  drawn,
+  setDrawn,
+  onBack,
+  onNext,
+}: NavProps & {
+  drawn: boolean;
+  setDrawn: (drawn: boolean) => void;
+}) {
   return (
     <div className="flex flex-col h-full">
       <Title>Draw your roof on the map</Title>
       <Sub>Click on the map to draw the corners of your roof.</Sub>
-      <div className="relative mt-6 rounded-2xl overflow-hidden border border-line aspect-[16/9] cursor-crosshair"
+      <div
+        className="relative mt-6 rounded-2xl overflow-hidden border border-line aspect-[16/9] cursor-crosshair"
         onClick={() => setDrawn(true)}
         style={{
-          background:
-            "linear-gradient(135deg, #6b7a6f 0%, #5d6b5f 30%, #4a5a4d 60%, #6b7a6f 100%)",
+          background: "linear-gradient(135deg, #6b7a6f 0%, #5d6b5f 30%, #4a5a4d 60%, #6b7a6f 100%)",
         }}
       >
         {/* Fake satellite */}
-        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 400 225">
+        <svg
+          className="absolute inset-0 w-full h-full"
+          preserveAspectRatio="none"
+          viewBox="0 0 400 225"
+        >
           <defs>
             <pattern id="trees" width="20" height="20" patternUnits="userSpaceOnUse">
               <circle cx="6" cy="6" r="4" fill="#3e5a40" opacity="0.6" />
@@ -192,8 +259,12 @@ function MapScreen({ drawn, setDrawn, onBack, onNext }: any) {
           )}
         </svg>
         <div className="absolute top-3 left-3 flex gap-1">
-          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white shadow">Satellite</button>
-          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white/80 shadow">Map</button>
+          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white shadow">
+            Satellite
+          </button>
+          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white/80 shadow">
+            Map
+          </button>
         </div>
         {!drawn && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 text-ink text-sm font-medium px-4 py-2 rounded-full shadow">
@@ -206,7 +277,15 @@ function MapScreen({ drawn, setDrawn, onBack, onNext }: any) {
   );
 }
 
-function RoofTypeScreen({ value, onChange, onBack, onNext }: any) {
+function RoofTypeScreen({
+  value,
+  onChange,
+  onBack,
+  onNext,
+}: NavProps & {
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <div className="flex flex-col h-full">
       <Title>What type of roof do you have?</Title>
@@ -217,9 +296,7 @@ function RoofTypeScreen({ value, onChange, onBack, onNext }: any) {
             key={t}
             onClick={() => onChange(t)}
             className={`p-4 rounded-2xl border-2 transition flex flex-col items-center gap-2 ${
-              value === t
-                ? "border-cloover bg-cloover-soft"
-                : "border-line hover:border-ink/40"
+              value === t ? "border-cloover bg-cloover-soft" : "border-line hover:border-ink/40"
             }`}
           >
             <RoofIcon type={t} />
@@ -272,7 +349,7 @@ function RoofIcon({ type }: { type: string }) {
   );
 }
 
-function PitchScreen({ data, update, onBack, onNext }: any) {
+function PitchScreen({ data, update, onBack, onNext }: DataScreenProps) {
   return (
     <div className="flex flex-col h-full">
       <Title>What is your roof pitch?</Title>
@@ -328,16 +405,35 @@ function AngleIcon({ a, active }: { a: string; active: boolean }) {
   if (a === "30°")
     return (
       <svg width="56" height="28" viewBox="0 0 56 28">
-        <polyline points="6,22 28,6 50,22" stroke={color} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline
+          points="6,22 28,6 50,22"
+          stroke={color}
+          strokeWidth="3"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   if (a === "45°")
     return (
       <svg width="56" height="32" viewBox="0 0 56 32">
-        <polyline points="10,28 28,4 46,28" stroke={color} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline
+          points="10,28 28,4 46,28"
+          stroke={color}
+          strokeWidth="3"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
-  return <input placeholder="Angle°" className="w-16 text-center text-xs px-2 py-1 border border-line rounded" />;
+  return (
+    <input
+      placeholder="Angle°"
+      className="w-16 text-center text-xs px-2 py-1 border border-line rounded"
+    />
+  );
 }
 
 function IconCard({
@@ -364,7 +460,7 @@ function IconCard({
   );
 }
 
-function ConsumptionScreen({ data, update, onBack, onNext }: any) {
+function ConsumptionScreen({ data, update, onBack, onNext }: DataScreenProps) {
   const water = ["Oil, gas, wood, district heat", "Heat pump boiler", "Electric boiler"];
   const heat = ["Oil, gas, wood, district heat", "Heat pump", "Electric heating"];
   return (
@@ -388,7 +484,15 @@ function ConsumptionScreen({ data, update, onBack, onNext }: any) {
                 key={w}
                 active={data.hotWater === w}
                 onClick={() => update({ hotWater: w })}
-                icon={w.includes("Heat pump") ? <Flame className="w-10 h-10" /> : w.includes("Electric") ? <Plug className="w-10 h-10" /> : <Flame className="w-10 h-10" />}
+                icon={
+                  w.includes("Heat pump") ? (
+                    <Flame className="w-10 h-10" />
+                  ) : w.includes("Electric") ? (
+                    <Plug className="w-10 h-10" />
+                  ) : (
+                    <Flame className="w-10 h-10" />
+                  )
+                }
                 label={w}
               />
             ))}
@@ -402,7 +506,15 @@ function ConsumptionScreen({ data, update, onBack, onNext }: any) {
                 key={h}
                 active={data.heating === h}
                 onClick={() => update({ heating: h })}
-                icon={h.includes("Heat pump") ? <HomeIcon className="w-10 h-10" /> : h.includes("Electric") ? <Zap className="w-10 h-10" /> : <Flame className="w-10 h-10" />}
+                icon={
+                  h.includes("Heat pump") ? (
+                    <HomeIcon className="w-10 h-10" />
+                  ) : h.includes("Electric") ? (
+                    <Zap className="w-10 h-10" />
+                  ) : (
+                    <Flame className="w-10 h-10" />
+                  )
+                }
                 label={h}
               />
             ))}
@@ -411,11 +523,21 @@ function ConsumptionScreen({ data, update, onBack, onNext }: any) {
         <div className="flex items-center gap-4">
           <span className="text-sm">Do you have an electric vehicle (EV)?</span>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={!data.ev} onChange={() => update({ ev: false })} className="w-5 h-5 accent-ink" />
+            <input
+              type="checkbox"
+              checked={!data.ev}
+              onChange={() => update({ ev: false })}
+              className="w-5 h-5 accent-ink"
+            />
             No
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={data.ev} onChange={() => update({ ev: true })} className="w-5 h-5 accent-ink" />
+            <input
+              type="checkbox"
+              checked={data.ev}
+              onChange={() => update({ ev: true })}
+              className="w-5 h-5 accent-ink"
+            />
             Yes
           </label>
         </div>
@@ -425,7 +547,15 @@ function ConsumptionScreen({ data, update, onBack, onNext }: any) {
   );
 }
 
-function YearlyScreen({ data, update, monthlyCost, onBack, onNext }: any) {
+function YearlyScreen({
+  data,
+  update,
+  monthlyCost,
+  onBack,
+  onNext,
+}: DataScreenProps & {
+  monthlyCost: string;
+}) {
   return (
     <div className="flex flex-col h-full">
       <Title>Yearly consumption</Title>
@@ -439,10 +569,13 @@ function YearlyScreen({ data, update, monthlyCost, onBack, onNext }: any) {
               onChange={(e) => update({ yearlyKwh: Number(e.target.value) })}
               className="w-full px-5 py-4 pr-16 rounded-xl border border-line bg-white outline-none focus:border-cloover"
             />
-            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground">kWh</span>
+            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground">
+              kWh
+            </span>
           </div>
           <p className="mt-3 px-4 py-3 bg-surface-soft rounded-xl text-sm text-muted-foreground">
-            Our estimate based on your answers is <b className="text-ink">{data.yearlyKwh} kWh</b>, but you can look at your past bills to find your exact consumption.
+            Our estimate based on your answers is <b className="text-ink">{data.yearlyKwh} kWh</b>,
+            but you can look at your past bills to find your exact consumption.
           </p>
         </div>
         <div>
@@ -468,7 +601,15 @@ function YearlyScreen({ data, update, monthlyCost, onBack, onNext }: any) {
   );
 }
 
-function SummaryScreen({ data, monthlyCost, onBack, onNext }: any) {
+function SummaryScreen({
+  data,
+  monthlyCost,
+  onBack,
+  onNext,
+}: NavProps & {
+  data: OnboardingData;
+  monthlyCost: string;
+}) {
   const rows = [
     ["Roof type", data.roofType],
     ["Roof orientation", data.orientation],
@@ -483,13 +624,16 @@ function SummaryScreen({ data, monthlyCost, onBack, onNext }: any) {
       <Sub>A summary of the information you provided for your house</Sub>
       <div className="mt-8 space-y-2">
         {rows.map(([k, v]) => (
-          <div key={k} className="flex items-center justify-between px-5 py-4 border border-line rounded-xl">
+          <div
+            key={k}
+            className="flex items-center justify-between px-5 py-4 border border-line rounded-xl"
+          >
             <span className="text-ink">{k}</span>
             <span className="font-bold text-ink">{v}</span>
           </div>
         ))}
       </div>
-      <FooterBtns onBack={onBack} onNext={onNext} nextLabel="Build my Cloover configuration" />
+      <FooterBtns onBack={onBack} onNext={onNext} nextLabel="Build my home energy configuration" />
     </div>
   );
 }

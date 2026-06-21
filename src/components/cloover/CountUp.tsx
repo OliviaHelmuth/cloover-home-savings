@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
-export function CountUp({ value, prefix = "", suffix = "", duration = 600 }: { value: number; prefix?: string; suffix?: string; duration?: number }) {
+export function CountUp({
+  value,
+  prefix = "",
+  suffix = "",
+  duration = 600,
+}: {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+}) {
   const [display, setDisplay] = useState(value);
   const fromRef = useRef(value);
   useEffect(() => {
