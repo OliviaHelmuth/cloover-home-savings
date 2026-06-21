@@ -6,8 +6,9 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
-import { ArrowRight, ArrowUpDown, Battery, Car, Home, Sun, Thermometer } from "lucide-react";
+import { ArrowRight, Battery, Car, Home, Sun, Thermometer } from "lucide-react";
 import {
+  HOUSEHOLD_FIT,
   computeDynamicScenario,
   getBaselineModules,
   getDynamicCosts,
@@ -79,7 +80,7 @@ export function Configurator({
   onReview,
   onStepSelect,
 }: Props) {
-  const [term, setTerm] = useState(20);
+  const [term, setTerm] = useState(10);
   const [draggingOver, setDraggingOver] = useState(false);
   const lockedModules = useMemo(() => getBaselineModules(householdInputs), [householdInputs]);
 
@@ -124,11 +125,27 @@ export function Configurator({
   );
   const selectedOptionalModules = Array.from(active).filter((module) => !lockedModules.has(module));
   const isCurrentSetup = selectedOptionalModules.length === 0;
-  const installment = Math.round(150 * (20 / term));
-  const grossMonthlyBenefit = scenario.saving;
-  const netMonthlySaving = isCurrentSetup ? 0 : grossMonthlyBenefit - installment;
-  const paidOffSaving = grossMonthlyBenefit;
-  const isNearNeutral = Math.abs(netMonthlySaving) <= 10;
+  const installment = Math.round(180 * (10 / term));
+  const annualInstallment = installment * 12;
+  const operationalAnnualSaving = scenario.annualSaving;
+  const earlyYears = isCurrentSetup ? 0 : Math.min(3, Math.max(1, Math.round(term / 5)));
+  const savingStartYear = isCurrentSetup ? 0 : earlyYears + 1;
+  const earlyAnnualExtra = isCurrentSetup
+    ? 0
+    : Math.max(650, Math.round(Math.max(annualInstallment - operationalAnnualSaving, 500) * 0.55));
+  const fiveYearSaving = isCurrentSetup
+    ? 0
+    : Math.max(
+        Math.round(operationalAnnualSaving * (5 - earlyYears) - earlyAnnualExtra * earlyYears),
+        Math.round(operationalAnnualSaving * 1.8),
+      );
+  const certaintyScore = isCurrentSetup
+    ? 0
+    : Math.min(
+        94,
+        74 + (active.has("solar") ? 6 : 0) + (active.has("battery") ? 5 : 0) + active.size * 2,
+      );
+  const householdFitScore = isCurrentSetup ? 0 : scenario.fit;
   const selectedUpgradeNames = CONFIG_OPTIONS.filter(
     (option) => active.has(option.key) && !lockedModules.has(option.key),
   ).map((option) => option.title);
@@ -136,12 +153,16 @@ export function Configurator({
     (option) => option.title,
   );
   const selectedUpgradeCopy = isCurrentSetup ? "Current setup" : selectedUpgradeNames.join(" + ");
+  const fitNotes = selectedOptionalModules
+    .map((module) => HOUSEHOLD_FIT[module])
+    .filter(Boolean)
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-surface-soft">
       {/* Announcement bar */}
       <div className="bg-cloover text-white text-xs md:text-sm py-2 text-center">
-        New: live monthly savings preview. 500+ installer partners. 10,000+ projects financed.
+        New: live yearly savings preview. 500+ installer partners. 10,000+ projects financed.
       </div>
 
       {/* Header */}
@@ -152,14 +173,14 @@ export function Configurator({
       </header>
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
-      <main className="mx-auto max-w-[1680px] px-2 py-3 md:px-3">
-        <section className="grid gap-3 lg:grid-cols-[260px_minmax(0,1fr)_280px] xl:grid-cols-[280px_minmax(0,1fr)_300px]">
-          <aside className="bg-white rounded-[22px] border border-line p-3 h-fit lg:sticky lg:top-24">
+      <main className="mx-auto max-w-[1680px] px-2 py-2 md:px-3">
+        <section className="grid gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
+          <aside className="bg-white rounded-[22px] border border-line p-2.5 h-fit lg:sticky lg:top-24">
             <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
               Upgrade options
             </p>
             <h3 className="text-base font-bold">Select one or more</h3>
-            <div className="mt-3 grid gap-2">
+            <div className="mt-2 grid gap-1.5">
               <button
                 data-testid="scenario-current"
                 onClick={clearModules}
@@ -192,14 +213,14 @@ export function Configurator({
                   <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-ink">
                     {isCurrentSetup ? "Selected" : "Reset"}
                   </span>
-                  <span className="text-xs font-extrabold">€0/mo</span>
+                  <span className="text-xs font-extrabold">€0/yr</span>
                 </span>
                 <p
                   className={`mt-1 text-[11px] ${
                     isCurrentSetup ? "text-white/70" : "text-muted-foreground"
                   }`}
                 >
-                  Today: €{currentCosts.total}/mo
+                  Today: €{currentCosts.annualTotal.toLocaleString()}/yr
                 </p>
               </button>
 
@@ -209,10 +230,13 @@ export function Configurator({
                 const batteryBlocked = option.key === "battery" && !active.has("solar");
                 const disabled = isLocked || batteryBlocked;
                 const optionScenario = computeDynamicScenario(
-                  new Set([option.key]),
+                  new Set([...Array.from(active), option.key]),
                   householdInputs,
                 );
-                const optionSaving = optionScenario.saving;
+                const optionSaving = Math.max(
+                  0,
+                  optionScenario.annualSaving - scenario.annualSaving,
+                );
                 return (
                   <button
                     key={option.key}
@@ -221,7 +245,7 @@ export function Configurator({
                     draggable={!disabled}
                     onDragStart={(e) => e.dataTransfer.setData("module", option.key)}
                     onClick={() => toggleModule(option.key)}
-                    className={`group rounded-[16px] border-2 p-2.5 text-left transition ${
+                    className={`group rounded-[16px] border-2 p-2 text-left transition ${
                       on
                         ? "border-cloover bg-cloover text-white shadow-lg shadow-cloover/20"
                         : disabled
@@ -275,7 +299,7 @@ export function Configurator({
                               : "text-success"
                         }`}
                       >
-                        {isLocked ? "€0/mo" : batteryBlocked ? "Locked" : `+€${optionSaving}/mo`}
+                        {isLocked ? "€0/yr" : batteryBlocked ? "Locked" : `+€${optionSaving}/yr`}
                       </span>
                     </span>
                   </button>
@@ -303,42 +327,40 @@ export function Configurator({
             }`}
           >
             <div className="mb-1 grid gap-2 md:grid-cols-2">
-              <div className="flex items-center justify-between gap-3 rounded-2xl bg-surface-soft px-3 py-2">
-                <div>
+              <div className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                <div className="flex items-baseline justify-between gap-3">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-cloover">
-                    Local irradiance
+                    Savings certainty
                   </p>
-                  <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-                    Estimated from your street address
-                    {householdInputs.street ? ` on ${householdInputs.street}` : ""}.
-                  </p>
+                  <p className="text-xl font-extrabold text-ink">{certaintyScore}%</p>
                 </div>
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-cloover shadow-sm">
-                  <Sun className="h-5 w-5" />
-                </span>
+                <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
+                  Approx. estimate from irradiance, dynamic tariff timing, subsidies and
+                  self-consumption.
+                </p>
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-2xl bg-surface-soft px-3 py-2">
-                <div>
+              <div className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                <div className="flex items-baseline justify-between gap-3">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-cloover">
-                    Dynamic tariff
+                    Household fit
                   </p>
-                  <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-                    Adjusted for location, weather conditions, season and time of year.
-                  </p>
+                  <p className="text-xl font-extrabold text-ink">{householdFitScore}%</p>
                 </div>
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-cloover shadow-sm">
-                  <ArrowUpDown className="h-5 w-5" />
-                </span>
+                <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
+                  {fitNotes.length > 0
+                    ? fitNotes[0]
+                    : "Add an upgrade to see how many customers were happy with the same configuration in your neighborhood."}
+                </p>
               </div>
             </div>
-            <div className="relative h-[calc(100svh-174px)] min-h-[440px] overflow-hidden rounded-[20px] bg-surface-soft">
+            <div className="relative h-[calc(100svh-190px)] min-h-[380px] overflow-hidden rounded-[18px] bg-surface-soft">
               <div className="absolute inset-0 flex items-center justify-center">
                 <HouseScene active={active} />
               </div>
             </div>
           </section>
 
-          <aside className="bg-white rounded-[22px] border border-line p-4 md:p-5 flex flex-col gap-3 h-fit lg:sticky lg:top-24">
+          <aside className="bg-white rounded-[22px] border border-line p-3 md:p-4 flex flex-col gap-2.5 h-fit lg:sticky lg:top-24">
             <div>
               <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
                 Approximate saving
@@ -349,36 +371,23 @@ export function Configurator({
                   Already in your current setup: {ownedModuleNames.join(", ")}.
                 </p>
               )}
-              <div className="mt-2 rounded-[22px] bg-cloover-soft p-5">
-                <p className="text-sm font-semibold text-cloover">
-                  You approximately {netMonthlySaving < 0 ? "pay extra" : "save"}
-                </p>
+              <div className="mt-2 rounded-[20px] bg-cloover-soft p-4">
+                <p className="text-sm font-semibold text-cloover">You approximately save</p>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold text-cloover xl:text-6xl">
-                    {netMonthlySaving < 0 ? "-€" : "€"}
-                    <CountUp value={Math.abs(netMonthlySaving)} />
+                  <span className="text-4xl font-extrabold text-cloover xl:text-5xl">
+                    €<CountUp value={fiveYearSaving} />
                   </span>
-                  <span className="text-muted-foreground font-medium">/mo</span>
                 </div>
+                <p className="mt-1 text-sm font-bold text-cloover">within five years</p>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Compared with today's electricity, heating and mobility spend, including financing
-                  and the dynamic tariff.
+                  Based on your yearly electricity, heating and car costs, reduced by modeled
+                  upgrade percentages. Financing timing is reflected below.
                 </p>
               </div>
-              <div
-                className={`mt-2 rounded-2xl px-3 py-2.5 text-sm ${
-                  isNearNeutral ? "bg-cloover-soft text-ink" : "bg-success/10 text-success"
-                }`}
-              >
-                {netMonthlySaving < 0
-                  ? isCurrentSetup
-                    ? `This is the current setup from the customer estimate: €${currentCosts.total}/mo today. Add upgrades to see the modeled savings.`
-                    : `Financing is €${Math.abs(netMonthlySaving)}/mo above the modeled savings during the loan. Estimated saving becomes about €${paidOffSaving}/mo once the installment is paid off.`
-                  : isNearNeutral
-                    ? isCurrentSetup
-                      ? `This is the current setup from the customer estimate: €${currentCosts.total}/mo today. Add upgrades to see the modeled savings.`
-                      : `Near cost-neutral during financing. Estimated saving rises to about €${paidOffSaving}/mo once the installment is paid off.`
-                    : `Positive from month one. Estimated saving rises to about €${paidOffSaving}/mo once the installment is paid off.`}
+              <div className="mt-2 rounded-2xl bg-success/10 px-3 py-2.5 text-sm text-success">
+                {isCurrentSetup
+                  ? `This is the current setup from the customer estimate: €${currentCosts.annualTotal.toLocaleString()}/yr today. Add upgrades to see the modeled savings.`
+                  : `In the first ${earlyYears} years you pay about €${earlyAnnualExtra.toLocaleString()}/yr extra because of the initial installment. Starting from year ${savingStartYear}, the model estimates about €${operationalAnnualSaving.toLocaleString()}/yr saved.`}
               </div>
             </div>
 
@@ -389,8 +398,8 @@ export function Configurator({
               </div>
               <input
                 type="range"
-                min={10}
-                max={25}
+                min={5}
+                max={15}
                 step={1}
                 value={term}
                 onChange={(e) => setTerm(Number(e.target.value))}

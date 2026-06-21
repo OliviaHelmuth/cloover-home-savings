@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, MapPin, Users, Gauge, Flame, Car } from "lucide-react";
+import { ArrowRight, Sparkles, MapPin, Users, Gauge, Flame, Car, ChevronDown } from "lucide-react";
 import { getBaselineModules, type ModuleKey, type HouseholdInputs } from "@/lib/cloover-data";
 import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
@@ -21,21 +21,24 @@ const ADDRESS_SUGGESTIONS = [
     postalCode: "10435",
     label: "Prenzlauer Berg",
   },
-  { street: "Boxhagener Straße", streetNumber: "76", postalCode: "10245", label: "Friedrichshain" },
 ];
 
 const HOUSEHOLD_ESTIMATES: Record<
   number,
-  Pick<
-    HouseholdInputs,
-    "yearlyEnergyConsumption" | "monthlyElectricitySpend" | "monthlyHeatingSpend"
-  >
+  Pick<HouseholdInputs, "yearlyEnergyConsumption" | "annualElectricitySpend" | "annualHeatingSpend">
 > = {
-  1: { yearlyEnergyConsumption: 2200, monthlyElectricitySpend: 75, monthlyHeatingSpend: 125 },
-  2: { yearlyEnergyConsumption: 3200, monthlyElectricitySpend: 110, monthlyHeatingSpend: 170 },
-  3: { yearlyEnergyConsumption: 4500, monthlyElectricitySpend: 155, monthlyHeatingSpend: 220 },
-  4: { yearlyEnergyConsumption: 5800, monthlyElectricitySpend: 200, monthlyHeatingSpend: 265 },
+  1: { yearlyEnergyConsumption: 2200, annualElectricitySpend: 900, annualHeatingSpend: 1500 },
+  2: { yearlyEnergyConsumption: 3200, annualElectricitySpend: 1320, annualHeatingSpend: 2040 },
+  3: { yearlyEnergyConsumption: 4500, annualElectricitySpend: 1860, annualHeatingSpend: 2640 },
+  4: { yearlyEnergyConsumption: 5800, annualElectricitySpend: 2400, annualHeatingSpend: 3180 },
 };
+
+function getAnnualCarEstimate(carType: string) {
+  if (carType === "Petrol/Diesel") return 2160;
+  if (carType === "Hybrid") return 1440;
+  if (carType === "EV") return 720;
+  return 0;
+}
 
 export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect }: Props) {
   const activeModules = getBaselineModules(inputs);
@@ -64,8 +67,8 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
       ...inputs,
       householdSize,
       yearlyEnergyConsumption: estimate.yearlyEnergyConsumption,
-      monthlyElectricitySpend: estimate.monthlyElectricitySpend,
-      monthlyHeatingSpend: inputs.heatingType === "Heat Pump" ? 0 : estimate.monthlyHeatingSpend,
+      annualElectricitySpend: estimate.annualElectricitySpend,
+      annualHeatingSpend: inputs.heatingType === "Heat Pump" ? 0 : estimate.annualHeatingSpend,
     });
   };
 
@@ -74,7 +77,15 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
     onInputsChange({
       ...inputs,
       heatingType,
-      monthlyHeatingSpend: heatingType === "Heat Pump" ? 0 : estimate.monthlyHeatingSpend,
+      annualHeatingSpend: heatingType === "Heat Pump" ? 0 : estimate.annualHeatingSpend,
+    });
+  };
+
+  const updateCarType = (carType: string) => {
+    onInputsChange({
+      ...inputs,
+      carType,
+      annualCarSpend: getAnnualCarEstimate(carType),
     });
   };
 
@@ -88,22 +99,22 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
       <ProgressSteps activeStep={1} onStepSelect={(step) => onStepSelect(step, activeModules)} />
 
       <main>
-        <section className="mx-auto grid min-h-[calc(100svh-73px)] max-w-7xl items-center gap-8 px-5 py-6 md:px-6 lg:h-[calc(100vh-73px)] lg:min-h-0 lg:grid-cols-[0.82fr_1.18fr]">
+        <section className="mx-auto grid min-h-[calc(100svh-135px)] max-w-7xl items-center gap-6 px-5 py-3 md:px-6 lg:h-[calc(100svh-135px)] lg:min-h-0 lg:grid-cols-[0.82fr_1.18fr]">
           <div>
-            <h1 className="max-w-3xl text-5xl font-extrabold leading-[0.98] md:text-6xl xl:text-7xl">
+            <h1 className="max-w-3xl text-4xl font-extrabold leading-[0.98] md:text-5xl xl:text-6xl">
               Green energy isn't just cleaner.
               <span className="mt-3 block text-cloover">It's cheaper in the long run.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground xl:text-xl xl:leading-9">
-              The right combination of technologies can save you more than any single upgrade would.
-              We’ll find the setup that works best for your home.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground xl:text-lg xl:leading-8">
+              One smart plan. Years of lower energy costs. We’ll build the right setup of solar,
+              batteries, heating and EV charging that works best for your home.
             </p>
           </div>
 
           <div>
             {/* Household inputs calculator */}
-            <div className="space-y-4 rounded-[26px] border border-line bg-white p-5 shadow-2xl md:p-6">
-              <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
+            <div className="space-y-2.5 rounded-[20px] border border-line bg-white p-4 shadow-2xl">
+              <div className="flex items-center justify-between gap-3 border-b border-line pb-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-cloover" />
                   <div>
@@ -116,7 +127,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
               </div>
 
               {/* Address details */}
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 <h3 className="text-xs font-bold text-ink/80 flex items-center gap-1.5">
                   <MapPin className="h-4 w-4 text-cloover" />
                   Address details
@@ -126,24 +137,25 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
                       Street
                     </label>
-                    <input
-                      type="text"
-                      value={inputs.street}
-                      onChange={(e) => updateStreet(e.target.value)}
-                      placeholder="e.g. Friedrichstraße"
-                      list="home-address-suggestions"
-                      autoComplete="street-address"
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none"
-                    />
-                    <datalist id="home-address-suggestions">
-                      {ADDRESS_SUGGESTIONS.map((address) => (
-                        <option
-                          key={`${address.street}-${address.postalCode}`}
-                          value={address.street}
-                          label={`${address.street} ${address.streetNumber}, ${address.postalCode} ${address.label}`}
-                        />
-                      ))}
-                    </datalist>
+                    <div className="relative">
+                      <select
+                        value={inputs.street}
+                        onChange={(e) => updateStreet(e.target.value)}
+                        className="material-field w-full appearance-none px-3 py-2 pr-9 text-sm outline-none"
+                        autoComplete="street-address"
+                      >
+                        {ADDRESS_SUGGESTIONS.map((address) => (
+                          <option
+                            key={`${address.street}-${address.postalCode}`}
+                            value={address.street}
+                          >
+                            {address.street} {address.streetNumber}, {address.postalCode} ·{" "}
+                            {address.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
@@ -155,7 +167,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                       onChange={(e) => onInputsChange({ ...inputs, streetNumber: e.target.value })}
                       placeholder="e.g. 12"
                       autoComplete="address-line2"
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none"
+                      className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
                   <div>
@@ -168,14 +180,14 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                       onChange={(e) => onInputsChange({ ...inputs, postalCode: e.target.value })}
                       placeholder="e.g. 10117"
                       autoComplete="postal-code"
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none"
+                      className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Energy & Spends */}
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 <h3 className="text-xs font-bold text-ink/80 flex items-center gap-1.5">
                   <Flame className="h-4 w-4 text-cloover" />
                   Energy & Spend
@@ -185,50 +197,53 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
                       Heating type
                     </label>
-                    <select
-                      value={inputs.heatingType}
-                      onChange={(e) => updateHeatingType(e.target.value)}
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none appearance-none"
-                    >
-                      <option value="Gas">Gas</option>
-                      <option value="Oil">Oil</option>
-                      <option value="Heat Pump">Electric Heat Pump</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={inputs.heatingType}
+                        onChange={(e) => updateHeatingType(e.target.value)}
+                        className="material-field w-full appearance-none px-3 py-2 pr-9 text-sm outline-none"
+                      >
+                        <option value="Gas">Gas heating</option>
+                        <option value="Oil">Oil heating</option>
+                        <option value="Heat Pump">Electric heat pump</option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
-                      Monthly Heating Spend (€)
+                      Yearly heating cost (€)
                     </label>
                     <input
                       type="number"
-                      value={inputs.monthlyHeatingSpend}
+                      value={inputs.annualHeatingSpend}
                       onChange={(e) =>
-                        onInputsChange({ ...inputs, monthlyHeatingSpend: Number(e.target.value) })
+                        onInputsChange({ ...inputs, annualHeatingSpend: Number(e.target.value) })
                       }
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none"
+                      className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
-                      Monthly Elec Spend (€)
+                      Yearly electricity cost (€)
                     </label>
                     <input
                       type="number"
-                      value={inputs.monthlyElectricitySpend}
+                      value={inputs.annualElectricitySpend}
                       onChange={(e) =>
                         onInputsChange({
                           ...inputs,
-                          monthlyElectricitySpend: Number(e.target.value),
+                          annualElectricitySpend: Number(e.target.value),
                         })
                       }
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none"
+                      className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Household & Mobility */}
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 <h3 className="text-xs font-bold text-ink/80 flex items-center gap-1.5">
                   <Car className="h-4 w-4 text-cloover" />
                   Household & Mobility
@@ -238,20 +253,34 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
                       Car type
                     </label>
-                    <select
-                      value={inputs.carType}
-                      onChange={(e) => onInputsChange({ ...inputs, carType: e.target.value })}
-                      className="material-field w-full px-3 py-2.5 text-sm outline-none appearance-none"
-                    >
-                      <option value="Petrol/Diesel">Petrol/Diesel</option>
-                      <option value="Hybrid">Hybrid</option>
-                      <option value="EV">Electric Vehicle (EV)</option>
-                      <option value="No Car">No Car</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={inputs.carType}
+                        onChange={(e) => updateCarType(e.target.value)}
+                        className="material-field w-full appearance-none px-3 py-2 pr-9 text-sm outline-none"
+                      >
+                        <option value="Petrol/Diesel">Petrol or diesel</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="EV">Electric vehicle</option>
+                        <option value="No Car">No car</option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                    <label className="mt-2 block text-xs font-bold uppercase text-muted-foreground mb-1.5">
+                      Yearly car cost (€)
+                    </label>
+                    <input
+                      type="number"
+                      value={inputs.annualCarSpend}
+                      onChange={(e) =>
+                        onInputsChange({ ...inputs, annualCarSpend: Number(e.target.value) })
+                      }
+                      className="material-field w-full px-3 py-2 text-sm outline-none"
+                    />
                   </div>
 
                   <div className="sm:col-span-2 grid gap-2.5 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-surface-soft px-3 py-2">
+                    <div className="rounded-2xl bg-surface-soft px-3 py-1.5">
                       <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground mb-1">
                         <span className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" /> Household Size
@@ -277,7 +306,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-surface-soft px-3 py-2">
+                    <div className="rounded-2xl bg-surface-soft px-3 py-1.5">
                       <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground mb-1">
                         <span className="flex items-center gap-1">
                           <Gauge className="h-3.5 w-3.5" /> Yearly energy consumption
@@ -312,7 +341,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
 
               <button
                 onClick={handleCalculateClick}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-6 py-3 font-bold text-white transition hover:bg-cloover/90 shadow-lg shadow-cloover/20 cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-6 py-2.5 font-bold text-white transition hover:bg-cloover/90 shadow-lg shadow-cloover/20 cursor-pointer"
               >
                 Calculate my best savings plan <ArrowRight className="h-4 w-4" />
               </button>

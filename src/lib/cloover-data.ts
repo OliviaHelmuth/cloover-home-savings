@@ -116,8 +116,9 @@ export type HouseholdInputs = {
   streetNumber: string;
   postalCode: string;
   heatingType: string;
-  monthlyHeatingSpend: number;
-  monthlyElectricitySpend: number;
+  annualHeatingSpend: number;
+  annualElectricitySpend: number;
+  annualCarSpend: number;
   carType: string;
   householdSize: number;
   yearlyEnergyConsumption: number;
@@ -141,54 +142,85 @@ export const DEFAULT_HOUSEHOLD_INPUTS: HouseholdInputs = {
   streetNumber: "12",
   postalCode: "10117",
   heatingType: "Gas",
-  monthlyHeatingSpend: 220,
-  monthlyElectricitySpend: 170,
+  annualHeatingSpend: 2640,
+  annualElectricitySpend: 1860,
+  annualCarSpend: 2160,
   carType: "Petrol/Diesel",
   householdSize: 3,
   yearlyEnergyConsumption: 4500,
 };
 
+export const UPGRADE_SAVING_RATES = {
+  solarOnly: 0.3,
+  solarBattery: 0.69,
+  heatpumpOil: 0.34,
+  heatpumpGas: 0.15,
+  mobilityEv: 0.75,
+};
+
+export const HOUSEHOLD_FIT = {
+  solar: "82% of customers were happy with the same solar configuration in your neighborhood.",
+  battery:
+    "76% of customers were happy with the same solar and battery configuration in your neighborhood.",
+  heatpump:
+    "79% of customers were happy with the same heat pump configuration in your neighborhood.",
+  ev: "74% of customers were happy with the same electric vehicle configuration in your neighborhood.",
+} satisfies Partial<Record<ModuleKey, string>>;
+
 export function getDynamicCosts(inputs: HouseholdInputs) {
-  const electricity = inputs.monthlyElectricitySpend;
-  const heating = inputs.heatingType === "Heat Pump" ? 0 : inputs.monthlyHeatingSpend;
+  const annualElectricity = inputs.annualElectricitySpend;
+  const annualHeating = inputs.heatingType === "Heat Pump" ? 0 : inputs.annualHeatingSpend;
+  const annualMobility = inputs.carType === "No Car" ? 0 : inputs.annualCarSpend;
+  const annualTotal = annualElectricity + annualHeating + annualMobility;
 
-  let mobility = 0;
-  if (inputs.carType === "Petrol/Diesel") {
-    mobility = 180;
-  } else if (inputs.carType === "Hybrid") {
-    mobility = 120;
-  } else if (inputs.carType === "EV") {
-    mobility = 60;
-  } else {
-    mobility = 0;
-  }
-
+  const electricity = Math.round(annualElectricity / 12);
+  const heating = Math.round(annualHeating / 12);
+  const mobility = Math.round(annualMobility / 12);
   const total = electricity + heating + mobility;
-  return { electricity, heating, mobility, total };
+  return {
+    electricity,
+    heating,
+    mobility,
+    total,
+    annualElectricity,
+    annualHeating,
+    annualMobility,
+    annualTotal,
+  };
 }
 
 export function computeDynamicScenario(active: Set<ModuleKey>, inputs: HouseholdInputs) {
   const costs = getDynamicCosts(inputs);
 
-  let saving = 0;
+  let annualSaving = 0;
+  const breakdown = {
+    electricity: 0,
+    heating: 0,
+    mobility: 0,
+  };
+
   if (active.has("solar")) {
-    saving += Math.round(costs.electricity * 0.625);
+    const electricityRate = active.has("battery")
+      ? UPGRADE_SAVING_RATES.solarBattery
+      : UPGRADE_SAVING_RATES.solarOnly;
+    breakdown.electricity += Math.round(costs.annualElectricity * electricityRate);
   }
   if (active.has("heatpump") && inputs.heatingType !== "Heat Pump") {
-    saving += Math.round(costs.heating * 0.196);
+    const heatingRate =
+      inputs.heatingType === "Oil"
+        ? UPGRADE_SAVING_RATES.heatpumpOil
+        : UPGRADE_SAVING_RATES.heatpumpGas;
+    breakdown.heating += Math.round(costs.annualHeating * heatingRate);
   }
   if (active.has("ev") && inputs.carType !== "EV" && inputs.carType !== "No Car") {
-    saving += Math.round(costs.mobility * 0.04);
-  }
-
-  // Adjust for other modules if any
-  if (active.has("battery")) {
-    saving += 10;
+    breakdown.mobility += Math.round(costs.annualMobility * UPGRADE_SAVING_RATES.mobilityEv);
   }
   if (active.has("tariff")) {
-    saving += 15;
+    breakdown.electricity += Math.round(costs.annualElectricity * 0.08);
   }
 
+  annualSaving = breakdown.electricity + breakdown.heating + breakdown.mobility;
+  const saving = Math.round(annualSaving / 12);
   const cloover = Math.max(costs.total - saving, 150);
   const fit = Math.min(100, Math.max(30, 40 + active.size * 12 + inputs.householdSize * 5));
 
@@ -196,6 +228,8 @@ export function computeDynamicScenario(active: Set<ModuleKey>, inputs: Household
     modules: Array.from(active),
     cloover,
     saving,
+    annualSaving,
+    breakdown,
     fit,
   };
 }

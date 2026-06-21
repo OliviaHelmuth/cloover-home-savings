@@ -27,27 +27,27 @@ export function Proposal({
       .map((m) => MODULE_LABELS[m])
       .join(" + ") || "None";
 
-  const advisorText = `Your strongest option is the setup: ${activeLabels}. Your current electricity, heating, and mobility costs are estimated at €${costs.total} per month: €${costs.electricity} electricity, €${costs.heating} heating, and €${costs.mobility} mobility. With the recommended plan, your new monthly cost including financing is estimated at €${scenario.cloover}, so you save €${scenario.saving} per month during financing and the saving grows again once financing is paid off.
+  const advisorText = `Your strongest option is the setup: ${activeLabels}. Your current electricity, heating, and mobility costs are estimated at €${costs.annualTotal.toLocaleString()} per year: €${costs.annualElectricity.toLocaleString()} electricity, €${costs.annualHeating.toLocaleString()} heating, and €${costs.annualMobility.toLocaleString()} mobility. With the recommended plan, operational savings are estimated at about €${scenario.annualSaving.toLocaleString()} per year, or €${scenario.saving} per month before the financing installment is considered.
 
-The Electricity lever adds roof solar and models self-consumption, cheap-hour battery charging, and dynamic tariff arbitrage. The Heating lever is a powerful upsell because fossil heating spend moves to a heat pump powered partly by self-generated electricity. The Mobility lever completes the path by replacing petrol spend with cheap off-peak EV charging.`;
+This is an approximate estimate. The Electricity lever applies solar self-consumption and battery uplift to the yearly electricity bill. The Heating lever reduces fossil heating spend with a heat pump. The Mobility lever reduces yearly petrol or hybrid running cost with home EV charging. Local irradiance, dynamic tariff timing, subsidies and self-consumption ratio should be validated before final quote.`;
 
-  const installerText = `Recommended home energy package: ${activeLabels}. Based on the household's current electricity (€${costs.electricity}/month), heating (€${costs.heating}/month), and mobility (€${costs.mobility}/month) spend, current energy-related outgoings are estimated at €${costs.total}/month. The Electricity lever adds solar self-consumption and dynamic tariff optimization; Heating replaces oil/gas with a heat pump; Mobility replaces petrol with off-peak EV charging. The package is estimated at €${scenario.cloover}/month including financing, creating an estimated monthly saving of €${scenario.saving} during financing, with higher savings once financing is paid off. The package also avoids about 4.1 tonnes of CO₂ per year.`;
+  const installerText = `Recommended home energy package: ${activeLabels}. Based on the household's yearly electricity (€${costs.annualElectricity.toLocaleString()}), heating (€${costs.annualHeating.toLocaleString()}), and mobility (€${costs.annualMobility.toLocaleString()}) spend, current energy-related outgoings are estimated at €${costs.annualTotal.toLocaleString()}/year. The model applies plausible reduction percentages to those yearly spend buckets: solar and battery reduce electricity spend, heat pump reduces fossil heating spend, and EV charging reduces car running cost. Operational savings are estimated at €${scenario.annualSaving.toLocaleString()}/year, or about €${scenario.saving}/month before financing. During the first years, the monthly installment may outweigh part of that benefit; after financing, the full operational saving remains. Final quote should validate irradiance, dynamic tariff assumptions, subsidies and self-consumption ratio.`;
 
   const fitBuckets = [
     [
       "Electricity",
-      "Solar self-consumption + battery cheap-hour arbitrage",
-      `+€${Math.round(costs.electricity * 0.625)}/mo`,
+      "Solar self-consumption + battery storage applied to yearly electricity spend",
+      `+€${Math.round(scenario.breakdown.electricity / 12)}/mo`,
     ],
     [
       "Heating",
-      "Oil/gas spend displaced by heat pump electricity",
-      `+€${householdInputs.heatingType !== "Heat Pump" ? Math.round(costs.heating * 0.196) : 0}/mo`,
+      "Oil/gas spend reduced by switching to a heat pump",
+      `+€${Math.round(scenario.breakdown.heating / 12)}/mo`,
     ],
     [
       "Mobility",
-      "Petrol spend displaced by off-peak EV charging",
-      `+€${householdInputs.carType !== "EV" && householdInputs.carType !== "No Car" ? Math.round(costs.mobility * 0.04) : 0}/mo`,
+      "Petrol or hybrid running cost reduced by home EV charging",
+      `+€${Math.round(scenario.breakdown.mobility / 12)}/mo`,
     ],
   ];
 
@@ -109,11 +109,11 @@ The Electricity lever adds roof solar and models self-consumption, cheap-hour ba
         {/* Plan effect visual */}
         <section className="bg-white rounded-[28px] border border-line p-8">
           <h2 className="text-2xl md:text-3xl font-bold">
-            The plan effect: customers benefit from month 1
+            The plan effect: operating costs fall, financing changes the timing
           </h2>
           <p className="text-muted-foreground mt-2 max-w-3xl">
-            You pay a monthly plan rate, but your old energy bill drops by more than the rate costs.
-            That's why you benefit from the first month.
+            The upgrade reduces yearly energy spend first. In the beginning, financing may make the
+            monthly number higher; after the installment ends, the operational saving remains.
           </p>
 
           <div className="mt-8 grid md:grid-cols-[140px_1fr_140px] gap-6 items-end">
@@ -159,7 +159,7 @@ The Electricity lever adds roof solar and models self-consumption, cheap-hour ba
                 <span className="text-2xl font-bold">€{scenario.cloover}</span>
               </div>
               <div className="mt-3 text-success font-bold text-sm">
-                €{scenario.saving}/mo saved from month 1
+                €{scenario.saving}/mo operational saving
               </div>
             </div>
           </div>
@@ -169,11 +169,11 @@ The Electricity lever adds roof solar and models self-consumption, cheap-hour ba
               <p className="text-xs uppercase font-semibold text-muted-foreground">
                 During financing
               </p>
-              <p className="text-xl font-bold mt-1">€{scenario.saving}/month saved</p>
+              <p className="text-xl font-bold mt-1">Installment may offset early savings</p>
             </div>
             <div className="rounded-2xl border border-line p-5">
               <p className="text-xs uppercase font-semibold text-cloover">After financing</p>
-              <p className="text-xl font-bold mt-1">Bigger savings — the installment ends</p>
+              <p className="text-xl font-bold mt-1">About €{scenario.saving}/month saved</p>
             </div>
           </div>
         </section>
@@ -258,27 +258,17 @@ The Electricity lever adds roof solar and models self-consumption, cheap-hour ba
             <ul className="mt-4 space-y-2 text-sm">
               <li className="flex justify-between">
                 <span>Electricity</span>
-                <b className="text-success">+€{Math.round(costs.electricity * 0.625)}/mo</b>
+                <b className="text-success">
+                  +€{Math.round(scenario.breakdown.electricity / 12)}/mo
+                </b>
               </li>
               <li className="flex justify-between">
                 <span>Heating</span>
-                <b className="text-success">
-                  +€
-                  {householdInputs.heatingType !== "Heat Pump"
-                    ? Math.round(costs.heating * 0.196)
-                    : 0}
-                  /mo
-                </b>
+                <b className="text-success">+€{Math.round(scenario.breakdown.heating / 12)}/mo</b>
               </li>
               <li className="flex justify-between">
                 <span>Mobility</span>
-                <b className="text-success">
-                  +€
-                  {householdInputs.carType !== "EV" && householdInputs.carType !== "No Car"
-                    ? Math.round(costs.mobility * 0.04)
-                    : 0}
-                  /mo
-                </b>
+                <b className="text-success">+€{Math.round(scenario.breakdown.mobility / 12)}/mo</b>
               </li>
               <li className="flex justify-between border-t border-line pt-2 mt-2">
                 <span className="font-bold">Total monthly saving</span>
