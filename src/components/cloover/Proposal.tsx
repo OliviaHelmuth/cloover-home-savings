@@ -17,7 +17,6 @@ import {
   Award,
   Users,
 } from "lucide-react";
-import jsPDF from "jspdf";
 import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 import {
@@ -101,6 +100,9 @@ const CERTAINTY_INPUTS = [
   },
 ];
 
+const SOLARA_PHONE = "+49 800 765 272";
+const SOLARA_EMAIL = "savings@solara.energy";
+
 export function Proposal({
   householdInputs,
   active,
@@ -117,6 +119,16 @@ export function Proposal({
     () => computeFiveYearSaving(active, householdInputs),
     [active, householdInputs],
   );
+  const customerNumber = useMemo(() => {
+    const streetCode = householdInputs.streetNumber.replace(/\D/g, "") || "00";
+    const spendCode = String(
+      (householdInputs.annualElectricitySpend +
+        householdInputs.annualHeatingSpend +
+        householdInputs.annualCarSpend) %
+        1000,
+    ).padStart(3, "0");
+    return `SOL-${householdInputs.postalCode}-${streetCode}-${spendCode}`;
+  }, [householdInputs]);
 
   const computedScenarios = useMemo(
     () =>
@@ -146,113 +158,68 @@ export function Proposal({
       .map((m) => MODULE_LABELS[m])
       .join(" + ") || "Current setup";
 
-  const installerText = `Recommended package for ${householdInputs.street} ${householdInputs.streetNumber}, ${householdInputs.postalCode}: ${activeLabels}. Baseline (yr): electricity €${costs.annualElectricity.toLocaleString()}, heating €${costs.annualHeating.toLocaleString()} (${householdInputs.heatingType}), mobility €${costs.annualMobility.toLocaleString()} (${householdInputs.carType}). Modeled saving: €${main.annualSaving.toLocaleString()}/yr, €${main.fiveYear.toLocaleString()} over 5 years. Recommended scenario: ${recommended.label} (€${recommended.fiveYear.toLocaleString()}). Final quote should validate local irradiance at ${householdInputs.postalCode}, dynamic tariff timing, BEG/KfW subsidies and self-consumption ratio.`;
+  const installerText = `Customer number: ${customerNumber}. Recommended package for ${householdInputs.street} ${householdInputs.streetNumber}, ${householdInputs.postalCode}: ${activeLabels}. Baseline (yr): electricity €${costs.annualElectricity.toLocaleString()}, heating €${costs.annualHeating.toLocaleString()} (${householdInputs.heatingType}), mobility €${costs.annualMobility.toLocaleString()} (${householdInputs.carType}). Modeled saving: €${main.annualSaving.toLocaleString()}/yr, €${main.fiveYear.toLocaleString()} over 5 years. Recommended scenario: ${recommended.label} (€${recommended.fiveYear.toLocaleString()}). Next steps: call Solara at ${SOLARA_PHONE} or email ${SOLARA_EMAIL} with customer number ${customerNumber}. Final quote should validate local irradiance at ${householdInputs.postalCode}, dynamic tariff timing, BEG/KfW subsidies and self-consumption ratio.`;
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const W = doc.internal.pageSize.getWidth();
-    let y = 0;
+  const handleDownloadPlan = () => {
+    const scenarioRows = computedScenarios
+      .map((s) => {
+        const tag =
+          s.key === recommended.key
+            ? " (recommended)"
+            : activeKey && s.key === activeKey.key
+              ? " (your pick)"
+              : "";
+        return `- ${s.label}${tag}: €${s.fiveYear.toLocaleString()} over 5 years · €${s.annualSaving.toLocaleString()}/year`;
+      })
+      .join("\n");
 
-    doc.setFillColor(0, 46, 255);
-    doc.rect(0, 0, W, 90, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text("Solara Savings Plan", 40, 45);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text("Personalised home energy proposal · estimate", 40, 65);
-    doc.text(new Date().toLocaleDateString(), W - 40, 65, { align: "right" });
+    const certaintyRows = CERTAINTY_INPUTS.map(
+      (item) => `- ${item.title}: ${item.value}\n  ${item.detail}`,
+    ).join("\n");
 
-    y = 120;
-    doc.setTextColor(15, 23, 42);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("Household", 40, y);
-    y += 18;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    [
-      `Address: ${householdInputs.street} ${householdInputs.streetNumber}, ${householdInputs.postalCode}`,
-      `Household size: ${householdInputs.householdSize} people`,
-      `Heating: ${householdInputs.heatingType} · approx €${householdInputs.annualHeatingSpend.toLocaleString()}/yr`,
-      `Electricity: approx €${householdInputs.annualElectricitySpend.toLocaleString()}/yr (${householdInputs.yearlyEnergyConsumption.toLocaleString()} kWh)`,
-      `Mobility: ${householdInputs.carType} · approx €${householdInputs.annualCarSpend.toLocaleString()}/yr`,
-    ].forEach((line) => {
-      doc.text(line, 40, y);
-      y += 16;
-    });
+    const plan = `SOLARA SAVINGS PLAN
+Customer number: ${customerNumber}
+Created: ${new Date().toLocaleDateString()}
 
-    y += 10;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("Selected configuration", 40, y);
-    y += 18;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(activeLabels, 40, y);
-    y += 24;
+SUMMARY
+You save approximately €${main.annualSaving.toLocaleString()}/year.
+That is approximately €${main.fiveYear.toLocaleString()} within five years.
+Selected configuration: ${activeLabels}
 
-    doc.setFillColor(232, 238, 255);
-    doc.roundedRect(40, y, W - 80, 90, 10, 10, "F");
-    doc.setTextColor(0, 46, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("Estimated savings", 56, y + 24);
-    doc.setFontSize(26);
-    doc.text(`€${main.annualSaving.toLocaleString()} / year`, 56, y + 54);
-    doc.setFontSize(14);
-    doc.text(`€${main.fiveYear.toLocaleString()} over 5 years`, 56, y + 78);
-    y += 110;
+HOUSEHOLD
+Address: ${householdInputs.street} ${householdInputs.streetNumber}, ${householdInputs.postalCode}
+Household size: ${householdInputs.householdSize} people
+Heating: ${householdInputs.heatingType} · approx €${householdInputs.annualHeatingSpend.toLocaleString()}/year
+Electricity: approx €${householdInputs.annualElectricitySpend.toLocaleString()}/year (${householdInputs.yearlyEnergyConsumption.toLocaleString()} kWh)
+Mobility: ${householdInputs.carType} · approx €${householdInputs.annualCarSpend.toLocaleString()}/year
 
-    doc.setTextColor(15, 23, 42);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("Scenario comparison (5-year savings)", 40, y);
-    y += 18;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    computedScenarios.forEach((s) => {
-      const tag =
-        s.key === recommended.key
-          ? " (recommended)"
-          : activeKey && s.key === activeKey.key
-            ? " (your pick)"
-            : "";
-      doc.text(`${s.label}${tag}`, 40, y);
-      doc.text(`€${s.fiveYear.toLocaleString()}`, W - 40, y, { align: "right" });
-      y += 16;
-    });
+OPTIMIZE YOUR FINANCING AND SAVINGS POTENTIAL
+${scenarioRows}
 
-    y += 14;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("Savings certainty inputs", 40, y);
-    y += 18;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    CERTAINTY_INPUTS.forEach((c) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(`${c.title} — ${c.value}`, 40, y);
-      y += 14;
-      doc.setFont("helvetica", "normal");
-      const lines = doc.splitTextToSize(c.detail, W - 80);
-      doc.text(lines, 40, y);
-      y += lines.length * 13 + 6;
-    });
+SAVINGS CERTAINTY INPUTS
+${certaintyRows}
 
-    y += 10;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(9);
-    doc.setTextColor(100, 116, 139);
-    doc.text(
-      "All figures are estimates based on inputs and average regional tariffs. Final quote requires installer survey.",
-      40,
-      y,
-      { maxWidth: W - 80 },
-    );
+NEXT STEPS
+1. Keep this customer number ready: ${customerNumber}
+2. Call Solara: ${SOLARA_PHONE}
+3. Email your savings plan to Solara: ${SOLARA_EMAIL}
+4. Ask a nearby installer to check your proposal, confirm feasibility, roof geometry, grid fit and final pricing.
 
-    doc.save(`solara-savings-plan-${householdInputs.postalCode}.pdf`);
+INSTALLER NOTE
+${installerText}
+
+All figures are estimates based on your inputs and average regional tariffs. Final figures depend on installer survey and tariff details.
+`;
+
+    const blob = new Blob([plan], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `solara-savings-plan-${customerNumber}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -260,12 +227,6 @@ export function Proposal({
       <header className="bg-white/90 border-b border-line backdrop-blur sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <CloverLogo />
-          <button
-            onClick={handleDownloadPDF}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cloover text-white text-sm font-semibold hover:bg-cloover/90 shadow-sm shadow-cloover/20"
-          >
-            <Download className="w-4 h-4" /> Download plan
-          </button>
         </div>
       </header>
       <ProgressSteps activeStep={3} onStepSelect={onStepSelect} />
@@ -289,12 +250,12 @@ export function Proposal({
               Configuration: <b>{activeLabels}</b>. All figures are estimates.
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button
-                onClick={handleDownloadPDF}
+              <a
+                href="#optimize-savings"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cloover text-white font-bold hover:bg-cloover/90 shadow-lg shadow-cloover/25 text-sm"
               >
-                <Download className="w-4 h-4" /> Download savings plan
-              </button>
+                Optimize your financing and savings potential <ArrowRight className="w-4 h-4" />
+              </a>
               <button
                 onClick={() => onStepSelect(2)}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-line text-ink font-semibold hover:border-cloover/40 text-sm"
@@ -305,10 +266,10 @@ export function Proposal({
           </div>
 
           {/* Scenarios */}
-          <div className="mt-7 pt-6 border-t border-line">
+          <div id="optimize-savings" className="mt-7 scroll-mt-28 border-t border-line pt-6">
             <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
               <h2 className="text-lg md:text-xl font-bold">
-                Optimise your financing & savings potential
+                Optimize your financing & savings potential
               </h2>
               <p className="text-[11px] text-muted-foreground">
                 5-year savings · same scenarios as the configurator
@@ -394,6 +355,35 @@ export function Proposal({
                 </p>
               </div>
             )}
+
+            <div className="mt-5 rounded-2xl border border-cloover/20 bg-cloover-soft p-4 md:p-5">
+              <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+                <div>
+                  <p className="text-sm font-extrabold text-ink">Ready for the next step?</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Download the savings plan or ask one of your nearby installers to check the
+                    proposal, confirm feasibility and go into the green future together.
+                  </p>
+                  <p className="mt-2 text-xs font-semibold text-ink">
+                    Customer number: {customerNumber}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
+                  <button
+                    onClick={handleDownloadPlan}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-cloover/20 hover:bg-cloover/90"
+                  >
+                    <Download className="w-4 h-4" /> Download savings plan
+                  </button>
+                  <a
+                    href={`mailto:${SOLARA_EMAIL}?subject=Installer feasibility check ${customerNumber}&body=Hi Solara,%0A%0AI would like a nearby installer to check my savings plan and proposal feasibility.%0A%0ACustomer number: ${customerNumber}%0AAddress: ${householdInputs.street} ${householdInputs.streetNumber}, ${householdInputs.postalCode}%0A%0AThanks!`}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-white hover:bg-ink/90"
+                  >
+                    <Send className="w-4 h-4" /> Reach nearby installer
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -414,10 +404,7 @@ export function Proposal({
 
           <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
             {CERTAINTY_INPUTS.map((row) => (
-              <div
-                key={row.title}
-                className="rounded-xl border border-line p-3 bg-surface-soft/40"
-              >
+              <div key={row.title} className="rounded-xl border border-line p-3 bg-surface-soft/40">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-cloover-soft text-cloover grid place-items-center shrink-0">
                     <row.icon className="w-4 h-4" />

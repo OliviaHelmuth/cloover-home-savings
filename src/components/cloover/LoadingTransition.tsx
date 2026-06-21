@@ -69,7 +69,9 @@ export function LoadingTransition({ steps, title, subtitle, onDone, totalMs = 24
                     <span className="w-2 h-2 rounded-full bg-line" />
                   )}
                 </span>
-                <span className={`text-sm ${done || active ? "text-ink font-semibold" : "text-muted-foreground"}`}>
+                <span
+                  className={`text-sm ${done || active ? "text-ink font-semibold" : "text-muted-foreground"}`}
+                >
                   {s}
                 </span>
               </li>
