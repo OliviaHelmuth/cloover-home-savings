@@ -154,7 +154,7 @@ export function Configurator({
   );
   const selectedUpgradeCopy = isCurrentSetup ? "Current setup" : selectedUpgradeNames.join(" + ");
   const fitNotes = selectedOptionalModules
-    .map((module) => HOUSEHOLD_FIT[module as keyof typeof HOUSEHOLD_FIT])
+    .map((module) => HOUSEHOLD_FIT[module])
     .filter(Boolean)
     .slice(0, 2);
 
@@ -379,15 +379,11 @@ export function Configurator({
                   </span>
                 </div>
                 <p className="mt-1 text-sm font-bold text-cloover">within five years</p>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Based on your yearly electricity, heating and car costs, reduced by modeled
-                  upgrade percentages. Financing timing is reflected below.
-                </p>
               </div>
               <div className="mt-2 rounded-2xl bg-success/10 px-3 py-2.5 text-sm text-success">
                 {isCurrentSetup
                   ? `This is the current setup from the customer estimate: €${currentCosts.annualTotal.toLocaleString()}/yr today. Add upgrades to see the modeled savings.`
-                  : `In the first ${earlyYears} years you pay about €${earlyAnnualExtra.toLocaleString()}/yr extra because of the initial installment. Starting from year ${savingStartYear}, the model estimates about €${operationalAnnualSaving.toLocaleString()}/yr saved.`}
+                  : `Financing runs €${Math.round(earlyAnnualExtra / 12).toLocaleString()}/mo above savings during the loan. After that: €${Math.round(operationalAnnualSaving / 12).toLocaleString()}/mo saved.`}
               </div>
             </div>
 
