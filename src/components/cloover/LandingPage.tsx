@@ -57,9 +57,9 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
       street,
       ...(suggestion
         ? {
-            streetNumber: suggestion.streetNumber,
-            postalCode: suggestion.postalCode,
-          }
+          streetNumber: suggestion.streetNumber,
+          postalCode: suggestion.postalCode,
+        }
         : {}),
     });
   };
@@ -97,13 +97,11 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
         <section className="mx-auto grid min-h-[calc(100svh-73px)] max-w-7xl items-center gap-8 px-5 py-6 md:px-6 lg:h-[calc(100vh-73px)] lg:min-h-0 lg:grid-cols-[0.82fr_1.18fr]">
           <div>
             <h1 className="max-w-3xl text-5xl font-extrabold leading-[0.98] md:text-6xl xl:text-7xl">
-              Tell us about your home.
-              <span className="mt-3 block text-cloover">We'll show your real monthly savings.</span>
+              Green energy isn't just cleaner.
+              <span className="mt-3 block text-cloover">It's cheaper in the long run.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground xl:text-xl xl:leading-9">
-              Solar, battery, heat pump, EV charger, dynamic tariff, financing and energy management
-              come together into one monthly outcome. We need a few details to pick the best package
-              for you.
+              The right combination of technologies can save you more than any single upgrade would. We’ll find the setup that works best for your home.
             </p>
           </div>
 
@@ -321,7 +319,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                 onClick={handleCalculateClick}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-6 py-3 font-bold text-white transition hover:bg-cloover/90 shadow-lg shadow-cloover/20 cursor-pointer"
               >
-                Calculate my best home setup <ArrowRight className="h-4 w-4" />
+                Calculate my best savings plan <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
