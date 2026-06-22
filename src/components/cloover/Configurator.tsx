@@ -473,6 +473,7 @@ export function Configurator({
           </aside>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
