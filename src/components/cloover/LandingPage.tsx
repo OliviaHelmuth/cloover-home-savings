@@ -1,5 +1,20 @@
-import { ArrowRight, Sparkles, MapPin, Users, Gauge, Flame, Car, ChevronDown } from "lucide-react";
-import { getBaselineModules, type ModuleKey, type HouseholdInputs } from "@/lib/cloover-data";
+import {
+  ArrowRight,
+  Sparkles,
+  MapPin,
+  Users,
+  Gauge,
+  Flame,
+  Car,
+  ChevronDown,
+  Ruler,
+} from "lucide-react";
+import {
+  getBaselineModules,
+  getRoofEstimate,
+  type ModuleKey,
+  type HouseholdInputs,
+} from "@/lib/cloover-data";
 import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 
@@ -40,8 +55,17 @@ function getAnnualCarEstimate(carType: string) {
   return 0;
 }
 
+function monthlyValue(annualValue: number) {
+  return Math.round(annualValue / 12);
+}
+
+function annualValue(monthlyValue: number) {
+  return Math.round(monthlyValue * 12);
+}
+
 export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect }: Props) {
   const activeModules = getBaselineModules(inputs);
+  const roofEstimate = getRoofEstimate(inputs);
 
   const handleCalculateClick = () => {
     onCalculate(activeModules);
@@ -52,6 +76,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
     onInputsChange({
       ...inputs,
       street,
+      freeEstimate: null,
       ...(suggestion
         ? {
             streetNumber: suggestion.streetNumber,
@@ -66,6 +91,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
     onInputsChange({
       ...inputs,
       householdSize,
+      freeEstimate: null,
       yearlyEnergyConsumption: estimate.yearlyEnergyConsumption,
       annualElectricitySpend: estimate.annualElectricitySpend,
       annualHeatingSpend: inputs.heatingType === "Heat Pump" ? 0 : estimate.annualHeatingSpend,
@@ -164,7 +190,13 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <input
                       type="text"
                       value={inputs.streetNumber}
-                      onChange={(e) => onInputsChange({ ...inputs, streetNumber: e.target.value })}
+                      onChange={(e) =>
+                        onInputsChange({
+                          ...inputs,
+                          streetNumber: e.target.value,
+                          freeEstimate: null,
+                        })
+                      }
                       placeholder="e.g. 12"
                       autoComplete="address-line2"
                       className="material-field w-full px-3 py-2 text-sm outline-none"
@@ -177,11 +209,37 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <input
                       type="text"
                       value={inputs.postalCode}
-                      onChange={(e) => onInputsChange({ ...inputs, postalCode: e.target.value })}
+                      onChange={(e) =>
+                        onInputsChange({
+                          ...inputs,
+                          postalCode: e.target.value,
+                          freeEstimate: null,
+                        })
+                      }
                       placeholder="e.g. 10117"
                       autoComplete="postal-code"
                       className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-cloover/15 bg-cloover-soft/70 px-3 py-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-white text-cloover">
+                        <Ruler className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-extrabold text-ink">Usable roof size</p>
+                        <p className="text-[11px] leading-4 text-muted-foreground">
+                          For the full setup, customers will draw the usable roof area on an
+                          OpenStreetMap view.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-cloover">
+                      Est. {roofEstimate.usableRoofAreaM2.toFixed(0)} m² ·{" "}
+                      {roofEstimate.panelCountMax} panels
+                    </div>
                   </div>
                 </div>
               </div>
@@ -212,28 +270,31 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
-                      Yearly heating cost (€)
+                      Monthly heating cost (€)
                     </label>
                     <input
                       type="number"
-                      value={inputs.annualHeatingSpend}
+                      value={monthlyValue(inputs.annualHeatingSpend)}
                       onChange={(e) =>
-                        onInputsChange({ ...inputs, annualHeatingSpend: Number(e.target.value) })
+                        onInputsChange({
+                          ...inputs,
+                          annualHeatingSpend: annualValue(Number(e.target.value)),
+                        })
                       }
                       className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-muted-foreground mb-1.5">
-                      Yearly electricity cost (€)
+                      Monthly electricity cost (€)
                     </label>
                     <input
                       type="number"
-                      value={inputs.annualElectricitySpend}
+                      value={monthlyValue(inputs.annualElectricitySpend)}
                       onChange={(e) =>
                         onInputsChange({
                           ...inputs,
-                          annualElectricitySpend: Number(e.target.value),
+                          annualElectricitySpend: annualValue(Number(e.target.value)),
                         })
                       }
                       className="material-field w-full px-3 py-2 text-sm outline-none"
@@ -267,13 +328,16 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                       <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
                     <label className="mt-2 block text-xs font-bold uppercase text-muted-foreground mb-1.5">
-                      Yearly car cost (€)
+                      Monthly car cost (€)
                     </label>
                     <input
                       type="number"
-                      value={inputs.annualCarSpend}
+                      value={monthlyValue(inputs.annualCarSpend)}
                       onChange={(e) =>
-                        onInputsChange({ ...inputs, annualCarSpend: Number(e.target.value) })
+                        onInputsChange({
+                          ...inputs,
+                          annualCarSpend: annualValue(Number(e.target.value)),
+                        })
                       }
                       className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
@@ -309,7 +373,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
                     <div className="rounded-2xl bg-surface-soft px-3 py-1.5">
                       <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground mb-1">
                         <span className="flex items-center gap-1">
-                          <Gauge className="h-3.5 w-3.5" /> Yearly energy consumption
+                          <Gauge className="h-3.5 w-3.5" /> Electricity usage
                         </span>
                         <span className="text-cloover font-extrabold">
                           {inputs.yearlyEnergyConsumption.toLocaleString()} kWh
@@ -355,11 +419,11 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
           <div>
             <p className="font-extrabold text-ink">Credible savings, not guesswork.</p>
             <p className="mt-1 text-xs leading-5">
-              Estimates combine household spend, financing, tariff shifting and system fit before
+              Estimates combine household spend, usable roof size, financing and system fit before
               recommending a package.
             </p>
           </div>
-          <TrustItem label="Savings certainty" value="Irradiance, tariff, subsidies" />
+          <TrustItem label="Savings certainty" value="Irradiance, roof size, subsidies" />
           <TrustItem label="Household fit" value="Electricity, heating, mobility" />
           <TrustItem label="Proposal-ready" value="One monthly outcome" />
         </div>

@@ -8,13 +8,13 @@ Solara is an interactive home-energy savings advisor for the Cloover hackathon. 
 
 ## Product Flow
 
-1. **Inputs**: select a predefined address, household size, heating type, yearly electricity cost, yearly heating cost, car type, and yearly car cost.
+1. **Inputs**: select a predefined address, household size, heating type, monthly electricity cost, monthly heating cost, car type, and monthly car cost.
 2. **Configuration**: compare the current setup with upgrade options for solar, battery, heat pump, and electric vehicle. Battery is available only when solar is selected.
-3. **Final proposal**: review the approximate saving, optimize financing and savings potential, download the savings plan, and contact a nearby installer for feasibility checks.
+3. **Final proposal**: review the approximate monthly saving, optimize financing and savings potential, download the savings plan, and contact a nearby installer for feasibility checks.
 
 ## Savings Model
 
-The configurator estimates savings from annual household spend and applies simple hackathon-model assumptions:
+The configurator asks for monthly customer spend, converts it internally to annual values for energy modelling, then presents the result back as a monthly saving. It applies simple hackathon-model assumptions:
 
 - Solar only: 30% electricity cost reduction
 - Solar + battery: 69% electricity cost reduction
@@ -22,6 +22,17 @@ The configurator estimates savings from annual household spend and applies simpl
 - EV: 75% mobility cost reduction
 
 The proposal also explains the early financing period honestly: the customer may pay extra during the first years because of the installment, then savings improve once the plan reaches the modeled payback year.
+
+## Free Data Sources
+
+The app avoids paid Google APIs and uses free/open data where possible:
+
+- **PVGIS API**: estimates yearly solar production per kWp from latitude and longitude. It is called server-side through `/api/free-energy-estimate` because PVGIS does not support browser AJAX/CORS access.
+- **OpenStreetMap Nominatim**: turns the selected address into coordinates. The app only calls it after the user requests a calculation, not as live autocomplete.
+- **OpenStreetMap Overpass**: looks up nearby building footprints and converts the largest plausible footprint into an approximate usable roof area.
+- **Local fallback profiles**: if a public API is slow, unavailable, or cannot find a building, the model falls back to built-in Berlin/Germany estimates so the demo remains stable.
+
+These estimates are intentionally approximate. Final pricing still needs installer validation, roof survey, tariff confirmation, and subsidy eligibility checks.
 
 ## Tech Stack
 

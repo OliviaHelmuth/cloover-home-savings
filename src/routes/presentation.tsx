@@ -50,9 +50,9 @@ const slides = [
   {
     eyebrow: "The insight",
     title: "People do not buy panels. They buy a lower energy bill.",
-    body: "Solara makes the North Star one number: how much the household can save over time after the upgrade and financing are considered.",
+    body: "Solara makes the North Star one number: how much the household can save per month after the upgrade and financing are considered.",
     points: [
-      "Annual electricity, heating and mobility costs become the starting point.",
+      "Monthly electricity, heating and mobility costs become the starting point.",
       "The tool shows early installment impact honestly.",
       "The offer is framed as one savings plan, not a shopping cart.",
     ],
@@ -63,7 +63,7 @@ const slides = [
     title: "One advisor. One configurator. One savings plan.",
     body: "A homeowner enters minimal details, configures the home visually, then receives a proposal they can share with a nearby installer.",
     points: [
-      "Step 1: household inputs and yearly spend.",
+      "Step 1: household inputs and monthly spend.",
       "Step 2: visual home configurator with solar, battery, heat pump and EV.",
       "Step 3: proposal, savings plan download and installer CTA.",
     ],
@@ -108,7 +108,7 @@ const slides = [
 const productSteps = [
   {
     title: "Tell us about your home",
-    detail: "Address, heating, annual electricity cost, car type and yearly mobility cost.",
+    detail: "Address, heating, monthly electricity cost, car type and monthly mobility cost.",
     icon: Home,
   },
   {

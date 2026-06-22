@@ -6,9 +6,19 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
-import { ArrowRight, Battery, Car, Home, Sun, Thermometer } from "lucide-react";
 import {
-  HOUSEHOLD_FIT,
+  ArrowRight,
+  Battery,
+  Car,
+  Home,
+  MapPin,
+  Ruler,
+  ShieldCheck,
+  Sun,
+  Thermometer,
+} from "lucide-react";
+import {
+  computeFinancialPlan,
   computeDynamicScenario,
   getBaselineModules,
   getDynamicCosts,
@@ -69,6 +79,7 @@ type Props = {
   householdInputs: HouseholdInputs;
   active: Set<ModuleKey>;
   onActiveChange: Dispatch<SetStateAction<Set<ModuleKey>>>;
+  financingTerm: number;
   onReview: () => void;
   onStepSelect: (step: 1 | 2 | 3) => void;
 };
@@ -77,10 +88,10 @@ export function Configurator({
   householdInputs,
   active,
   onActiveChange,
+  financingTerm,
   onReview,
   onStepSelect,
 }: Props) {
-  const [term, setTerm] = useState(10);
   const [draggingOver, setDraggingOver] = useState(false);
   const lockedModules = useMemo(() => getBaselineModules(householdInputs), [householdInputs]);
 
@@ -123,29 +134,16 @@ export function Configurator({
     () => computeDynamicScenario(active, householdInputs),
     [active, householdInputs],
   );
+  const financialPlan = useMemo(
+    () => computeFinancialPlan(active, householdInputs, financingTerm),
+    [active, financingTerm, householdInputs],
+  );
   const selectedOptionalModules = Array.from(active).filter((module) => !lockedModules.has(module));
   const isCurrentSetup = selectedOptionalModules.length === 0;
-  const installment = Math.round(180 * (10 / term));
-  const annualInstallment = installment * 12;
-  const operationalAnnualSaving = scenario.annualSaving;
-  const earlyYears = isCurrentSetup ? 0 : Math.min(3, Math.max(1, Math.round(term / 5)));
-  const savingStartYear = isCurrentSetup ? 0 : earlyYears + 1;
-  const earlyAnnualExtra = isCurrentSetup
-    ? 0
-    : Math.max(650, Math.round(Math.max(annualInstallment - operationalAnnualSaving, 500) * 0.55));
-  const fiveYearSaving = isCurrentSetup
-    ? 0
-    : Math.max(
-        Math.round(operationalAnnualSaving * (5 - earlyYears) - earlyAnnualExtra * earlyYears),
-        Math.round(operationalAnnualSaving * 1.8),
-      );
-  const certaintyScore = isCurrentSetup
-    ? 0
-    : Math.min(
-        94,
-        74 + (active.has("solar") ? 6 : 0) + (active.has("battery") ? 5 : 0) + active.size * 2,
-      );
-  const householdFitScore = isCurrentSetup ? 0 : scenario.fit;
+  const monthlySaving = scenario.saving;
+  const projectedMonthlyEnergySpend = Math.max(currentCosts.total - monthlySaving, 0);
+  const monthlyDuringLoan = projectedMonthlyEnergySpend + financialPlan.monthlyInstallment;
+  const monthlyLoanDelta = monthlyDuringLoan - currentCosts.total;
   const selectedUpgradeNames = CONFIG_OPTIONS.filter(
     (option) => active.has(option.key) && !lockedModules.has(option.key),
   ).map((option) => option.title);
@@ -153,16 +151,44 @@ export function Configurator({
     (option) => option.title,
   );
   const selectedUpgradeCopy = isCurrentSetup ? "Current setup" : selectedUpgradeNames.join(" + ");
-  const fitNotes = selectedOptionalModules
-    .map((module) => HOUSEHOLD_FIT[module as keyof typeof HOUSEHOLD_FIT])
-    .filter(Boolean)
-    .slice(0, 2);
-
+  const freeEstimate = householdInputs.freeEstimate;
+  const solarSource =
+    freeEstimate?.irradianceSource === "pvgis"
+      ? "PVGIS live solar yield"
+      : freeEstimate
+        ? "regional solar fallback"
+        : "built-in regional profile";
+  const transparencyChecks = [
+    {
+      icon: MapPin,
+      label: "Address and roof",
+      value: `${householdInputs.street} ${householdInputs.streetNumber}`,
+      detail: `${scenario.roof.usableRoofAreaM2.toFixed(0)} m² usable roof estimate for ${householdInputs.postalCode}.`,
+    },
+    {
+      icon: Sun,
+      label: "Local sunlight",
+      value: `${scenario.roof.location.specificYieldKwhPerKwp} kWh/kWp`,
+      detail: `${solarSource}; adjusted by roof orientation and selected PV size.`,
+    },
+    {
+      icon: Ruler,
+      label: "Usable roof size",
+      value: `${scenario.roof.usableRoofAreaM2.toFixed(0)} m²`,
+      detail: `${scenario.roof.panelCountMax} panel cap before installer shading and obstruction checks.`,
+    },
+    {
+      icon: ShieldCheck,
+      label: "Home profile",
+      value: `${householdInputs.householdSize} people`,
+      detail: `${householdInputs.heatingType} heating and ${householdInputs.carType} mobility spend included.`,
+    },
+  ];
   return (
     <div className="min-h-screen bg-surface-soft">
       {/* Announcement bar */}
       <div className="bg-cloover text-white text-xs md:text-sm py-2 text-center">
-        New: live yearly savings preview. 500+ installer partners. 10,000+ projects financed.
+        New: live monthly savings preview. 500+ installer partners. 10,000+ projects financed.
       </div>
 
       {/* Header */}
@@ -213,14 +239,14 @@ export function Configurator({
                   <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-ink">
                     {isCurrentSetup ? "Selected" : "Reset"}
                   </span>
-                  <span className="text-xs font-extrabold">€0/yr</span>
+                  <span className="text-xs font-extrabold">€0/mo</span>
                 </span>
                 <p
                   className={`mt-1 text-[11px] ${
                     isCurrentSetup ? "text-white/70" : "text-muted-foreground"
                   }`}
                 >
-                  Today: €{currentCosts.annualTotal.toLocaleString()}/yr
+                  Today: €{currentCosts.total.toLocaleString()}/mo
                 </p>
               </button>
 
@@ -233,10 +259,7 @@ export function Configurator({
                   new Set([...Array.from(active), option.key]),
                   householdInputs,
                 );
-                const optionSaving = Math.max(
-                  0,
-                  optionScenario.annualSaving - scenario.annualSaving,
-                );
+                const optionSaving = Math.max(0, optionScenario.saving - scenario.saving);
                 return (
                   <button
                     key={option.key}
@@ -299,7 +322,7 @@ export function Configurator({
                               : "text-success"
                         }`}
                       >
-                        {isLocked ? "€0/yr" : batteryBlocked ? "Locked" : `+€${optionSaving}/yr`}
+                        {isLocked ? "€0/mo" : batteryBlocked ? "Locked" : `+€${optionSaving}/mo`}
                       </span>
                     </span>
                   </button>
@@ -326,34 +349,27 @@ export function Configurator({
               draggingOver ? "border-cloover bg-cloover-soft/40" : "border-line"
             }`}
           >
-            <div className="mb-1 grid gap-2 md:grid-cols-2">
-              <div className="rounded-2xl bg-white px-3 py-2 shadow-sm">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-cloover">
-                    Savings certainty
+            <div className="mb-1 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              {transparencyChecks.map((check) => (
+                <div key={check.label} className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-cloover-soft text-cloover">
+                      <check.icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-[11px] font-bold uppercase tracking-wide text-cloover">
+                        {check.label}
+                      </p>
+                      <p className="truncate text-xs font-extrabold text-ink">{check.value}</p>
+                    </div>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
+                    {check.detail}
                   </p>
-                  <p className="text-xl font-extrabold text-ink">{certaintyScore}%</p>
                 </div>
-                <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-                  Approx. estimate from irradiance, dynamic tariff timing, subsidies and
-                  self-consumption.
-                </p>
-              </div>
-              <div className="rounded-2xl bg-white px-3 py-2 shadow-sm">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-cloover">
-                    Household fit
-                  </p>
-                  <p className="text-xl font-extrabold text-ink">{householdFitScore}%</p>
-                </div>
-                <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-                  {fitNotes.length > 0
-                    ? fitNotes[0]
-                    : "Add an upgrade to see how many customers were happy with the same configuration in your neighborhood."}
-                </p>
-              </div>
+              ))}
             </div>
-            <div className="relative h-[calc(100svh-190px)] min-h-[380px] overflow-hidden rounded-[18px] bg-surface-soft">
+            <div className="relative h-[calc(100svh-220px)] min-h-[360px] overflow-hidden rounded-[18px] bg-surface-soft">
               <div className="absolute inset-0 flex items-center justify-center">
                 <HouseScene active={active} />
               </div>
@@ -371,40 +387,79 @@ export function Configurator({
                   Already in your current setup: {ownedModuleNames.join(", ")}.
                 </p>
               )}
-              <div className="mt-2 rounded-[20px] bg-cloover-soft p-4">
-                <p className="text-sm font-semibold text-cloover">You approximately save</p>
+              <div className="mt-2 rounded-[20px] border border-cloover/15 bg-cloover-soft p-4">
+                <p className="text-sm font-semibold text-cloover">Monthly saving after the loan</p>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-4xl font-extrabold text-cloover xl:text-5xl">
-                    €<CountUp value={fiveYearSaving} />
+                    €<CountUp value={monthlySaving} />
                   </span>
+                  <span className="text-sm font-bold text-cloover">/mo</span>
                 </div>
-                <p className="mt-1 text-sm font-bold text-cloover">within five years</p>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Based on your yearly electricity, heating and car costs, reduced by modeled
-                  upgrade percentages. Financing timing is reflected below.
+                <p className="mt-1 text-sm font-bold text-cloover">
+                  from year {financialPlan.termYears + 1}, once the loan is paid off
                 </p>
               </div>
-              <div className="mt-2 rounded-2xl bg-success/10 px-3 py-2.5 text-sm text-success">
-                {isCurrentSetup
-                  ? `This is the current setup from the customer estimate: €${currentCosts.annualTotal.toLocaleString()}/yr today. Add upgrades to see the modeled savings.`
-                  : `In the first ${earlyYears} years you pay about €${earlyAnnualExtra.toLocaleString()}/yr extra because of the initial installment. Starting from year ${savingStartYear}, the model estimates about €${operationalAnnualSaving.toLocaleString()}/yr saved.`}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-baseline justify-between mb-1">
-                <span className="text-xs font-medium text-muted-foreground">Financing term</span>
-                <span className="text-sm font-bold">{term} years</span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={15}
-                step={1}
-                value={term}
-                onChange={(e) => setTerm(Number(e.target.value))}
-                className="w-full accent-cloover"
-              />
+              {isCurrentSetup ? (
+                <div className="mt-2 rounded-2xl border border-line bg-surface-soft px-3 py-2.5 text-sm text-muted-foreground">
+                  This is the customer&apos;s current setup: €{currentCosts.total.toLocaleString()}
+                  /mo today. Add upgrades to compare equipment cost, financing and monthly bill
+                  reduction.
+                </div>
+              ) : (
+                <div className="mt-2 rounded-2xl border border-line bg-white px-3 py-2.5">
+                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Financing details
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <FinanceMetric
+                      label="Current monthly cost"
+                      value={`€${currentCosts.total.toLocaleString()}/mo`}
+                      note="energy, heating and mobility"
+                      tone="neutral"
+                    />
+                    <FinanceMetric
+                      label="Cost during loan"
+                      value={`€${monthlyDuringLoan.toLocaleString()}/mo`}
+                      note={
+                        monthlyLoanDelta > 0
+                          ? `€${Math.round(monthlyLoanDelta).toLocaleString()}/mo extra at first`
+                          : `€${Math.abs(Math.round(monthlyLoanDelta)).toLocaleString()}/mo ahead from month one`
+                      }
+                      tone={monthlyLoanDelta > 0 ? "warning" : "success"}
+                    />
+                    <FinanceMetric
+                      label="Cost after loan"
+                      value={`€${projectedMonthlyEnergySpend.toLocaleString()}/mo`}
+                      note={`€${monthlySaving.toLocaleString()}/mo lower than today`}
+                      tone="success"
+                    />
+                    <FinanceMetric
+                      label="Package price"
+                      value={`€${financialPlan.netCapex.toLocaleString()}`}
+                      note={
+                        financialPlan.subsidy > 0
+                          ? `estimated after €${financialPlan.subsidy.toLocaleString()} subsidy`
+                          : "estimated equipment and install cost"
+                      }
+                      tone="neutral"
+                    />
+                  </div>
+                  <div className="mt-2 rounded-xl bg-surface-soft px-3 py-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                      Cumulative break-even
+                    </p>
+                    <p className="mt-0.5 text-sm font-extrabold text-ink">
+                      {financialPlan.breakEvenYear > 0
+                        ? `Year ${financialPlan.breakEvenYear}`
+                        : "No upgrade selected"}
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
+                      The point where cumulative Solara spending becomes lower than staying with the
+                      current setup.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
@@ -421,6 +476,29 @@ export function Configurator({
           </aside>
         </section>
       </main>
+    </div>
+  );
+}
+
+function FinanceMetric({
+  label,
+  value,
+  note,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  tone?: "neutral" | "success" | "warning";
+}) {
+  const toneClass =
+    tone === "success" ? "text-success" : tone === "warning" ? "text-amber-600" : "text-ink";
+
+  return (
+    <div className="rounded-xl bg-surface-soft px-3 py-2">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 text-sm font-extrabold ${toneClass}`}>{value}</p>
+      {note && <p className="mt-0.5 text-[10px] leading-3 text-muted-foreground">{note}</p>}
     </div>
   );
 }
