@@ -29,6 +29,8 @@ import { CloverLogo } from "./Logo";
 import { HouseScene } from "./HouseScene";
 import { CountUp } from "./CountUp";
 import { ProgressSteps } from "./ProgressSteps";
+import { SiteHeader } from "./SiteHeader";
+import { SiteFooter } from "./SiteFooter";
 
 const CONFIG_OPTIONS: {
   key: ModuleKey;
