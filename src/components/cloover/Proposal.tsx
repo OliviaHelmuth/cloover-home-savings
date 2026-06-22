@@ -624,11 +624,7 @@ export function Proposal({
 
   return (
     <div className="min-h-screen bg-surface-soft">
-      <header className="bg-white/90 border-b border-line backdrop-blur sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
-          <CloverLogo />
-        </div>
-      </header>
+      <SiteHeader />
       <ProgressSteps activeStep={3} onStepSelect={onStepSelect} />
 
       <main className="max-w-7xl mx-auto px-6 py-6 space-y-5">
