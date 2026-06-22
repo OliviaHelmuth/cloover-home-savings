@@ -285,20 +285,20 @@ function SpendingOverTimeChart({
             </text>
           </g>
         ))}
-        {savingArea && <path d={savingArea} fill="#E8754F" opacity="0.08" />}
+        {savingArea && <path d={savingArea} fill="#1F6FEB" opacity="0.08" />}
         <path d={currentPath} fill="none" stroke="#111827" strokeWidth="5" strokeLinecap="round" />
         <path
           d={solaraPath}
           fill="none"
-          stroke="#E8754F"
+          stroke="#1F6FEB"
           strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <circle cx={x(0)} cy={currentY} r="5" fill="#111827" />
-        <circle cx={x(0)} cy={financedY} r="6" fill="#E8754F" />
-        <circle cx={x(term)} cy={afterY} r="6" fill="#E8754F" />
-        <circle cx={x(maxYear)} cy={afterY} r="6" fill="#E8754F" />
+        <circle cx={x(0)} cy={financedY} r="6" fill="#1F6FEB" />
+        <circle cx={x(term)} cy={afterY} r="6" fill="#1F6FEB" />
+        <circle cx={x(maxYear)} cy={afterY} r="6" fill="#1F6FEB" />
         <text x={padding.left} y={22} className="fill-muted-foreground text-[12px] font-semibold">
           monthly cost
         </text>
@@ -442,7 +442,7 @@ export function Proposal({
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 16;
-    const blue = "#E8754F";
+    const blue = "#1F6FEB";
     const blueSoft = "#EEF3FF";
     const ink = "#111827";
     const muted = "#667085";
