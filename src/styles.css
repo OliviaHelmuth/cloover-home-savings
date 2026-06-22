@@ -35,6 +35,9 @@
 
   --color-cloover: var(--cloover-blue);
   --color-cloover-soft: var(--blue-soft);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-sunshine: var(--sunshine);
   --color-ink: var(--ink);
   --color-line: var(--line);
   --color-surface: var(--surface);
