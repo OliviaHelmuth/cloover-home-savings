@@ -413,6 +413,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
         </section>
       </main>
 
+      <LandingSections />
       <SiteFooter />
     </div>
   );
