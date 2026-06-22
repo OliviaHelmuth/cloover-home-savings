@@ -3,11 +3,11 @@ import { useState } from "react";
 import { CloverLogo } from "./Logo";
 
 const NAV_ITEMS = [
-  { label: "How it works", href: "#how" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Savings", href: "#savings" },
-  { label: "Reviews", href: "#reviews" },
-  { label: "FAQ", href: "#faq" },
+  { label: "How it works", href: "/#how" },
+  { label: "Solutions", href: "/#solutions" },
+  { label: "Savings", href: "/#savings" },
+  { label: "Reviews", href: "/#reviews" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export function SiteHeader({ onCta }: { onCta?: () => void }) {

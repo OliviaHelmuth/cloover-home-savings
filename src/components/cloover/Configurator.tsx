@@ -25,10 +25,11 @@ import {
   type ModuleKey,
   type HouseholdInputs,
 } from "@/lib/cloover-data";
-import { CloverLogo } from "./Logo";
 import { HouseScene } from "./HouseScene";
 import { CountUp } from "./CountUp";
 import { ProgressSteps } from "./ProgressSteps";
+import { SiteHeader } from "./SiteHeader";
+import { SiteFooter } from "./SiteFooter";
 
 const CONFIG_OPTIONS: {
   key: ModuleKey;
@@ -191,12 +192,7 @@ export function Configurator({
         New: live monthly savings preview. 500+ installer partners. 10,000+ projects financed.
       </div>
 
-      {/* Header */}
-      <header className="bg-white/90 border-b border-line sticky top-0 z-30 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <CloverLogo />
-        </div>
-      </header>
+      <SiteHeader />
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
       <main className="mx-auto max-w-[1680px] px-2 py-2 md:px-3">
@@ -476,6 +472,7 @@ export function Configurator({
           </aside>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

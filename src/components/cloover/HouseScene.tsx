@@ -53,7 +53,7 @@ export function HouseScene({ active }: Props) {
 
       {/* <g className="cute-price-pill" filter="url(#imageSoftShadow)">
         <rect x="548" y="36" width="112" height="45" rx="13" fill="#ffffff" />
-        <circle cx="574" cy="58" r="8" fill="#E8754F" />
+        <circle cx="574" cy="58" r="8" fill="#1F6FEB" />
         <text x="592" y="65" fontSize="22" fontWeight="800" fill="#252a36">
           7.24 ct
         </text>
@@ -190,7 +190,7 @@ export function HouseScene({ active }: Props) {
           <text x="358" y="415" fontSize="15" fontWeight="700" fill="#8a8e9a" textAnchor="middle">
             Feed In
           </text>
-          <text x="358" y="445" fontSize="38" fontWeight="900" fill="#E8754F" textAnchor="middle">
+          <text x="358" y="445" fontSize="38" fontWeight="900" fill="#1F6FEB" textAnchor="middle">
             3639W
           </text>
         </g>

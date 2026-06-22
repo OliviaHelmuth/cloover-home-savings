@@ -15,10 +15,10 @@ import {
   type ModuleKey,
   type HouseholdInputs,
 } from "@/lib/cloover-data";
-import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
+import { LandingSections } from "./LandingSections";
 
 type Props = {
   inputs: HouseholdInputs;
@@ -412,6 +412,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
         </section>
       </main>
 
+      <LandingSections />
       <SiteFooter />
     </div>
   );
