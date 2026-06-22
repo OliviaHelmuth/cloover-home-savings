@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
