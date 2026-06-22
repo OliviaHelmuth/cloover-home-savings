@@ -59,6 +59,7 @@ Useful routes:
 /?step=landing
 /?step=configurator
 /?step=proposal
+/presentation
 ```
 
 ## Scripts
