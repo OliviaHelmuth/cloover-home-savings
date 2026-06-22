@@ -15,7 +15,6 @@ import {
   type ModuleKey,
   type HouseholdInputs,
 } from "@/lib/cloover-data";
-import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
