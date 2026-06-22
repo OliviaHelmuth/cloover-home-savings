@@ -17,6 +17,8 @@ import {
 } from "@/lib/cloover-data";
 import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
+import { SiteHeader } from "./SiteHeader";
+import { SiteFooter } from "./SiteFooter";
 
 type Props = {
   inputs: HouseholdInputs;
@@ -116,12 +118,8 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
   };
 
   return (
-    <div className="min-h-screen bg-surface text-ink">
-      <header className="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-6">
-          <CloverLogo />
-        </div>
-      </header>
+    <div className="min-h-screen bg-surface text-ink premium-bg">
+      <SiteHeader onCta={handleCalculateClick} />
       <ProgressSteps activeStep={1} onStepSelect={(step) => onStepSelect(step, activeModules)} />
 
       <main>
@@ -414,29 +412,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
         </section>
       </main>
 
-      <footer className="border-t border-line bg-white">
-        <div className="mx-auto grid max-w-7xl gap-4 px-5 py-5 text-sm text-muted-foreground md:grid-cols-[1.1fr_1fr_1fr_1fr] md:px-6">
-          <div>
-            <p className="font-extrabold text-ink">Credible savings, not guesswork.</p>
-            <p className="mt-1 text-xs leading-5">
-              Estimates combine household spend, usable roof size, financing and system fit before
-              recommending a package.
-            </p>
-          </div>
-          <TrustItem label="Savings certainty" value="Irradiance, roof size, subsidies" />
-          <TrustItem label="Household fit" value="Electricity, heating, mobility" />
-          <TrustItem label="Proposal-ready" value="One monthly outcome" />
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-function TrustItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-surface-soft px-4 py-3">
-      <p className="text-xs font-bold uppercase tracking-wide text-cloover">{label}</p>
-      <p className="mt-1 font-semibold text-ink">{value}</p>
+      <SiteFooter />
     </div>
   );
 }

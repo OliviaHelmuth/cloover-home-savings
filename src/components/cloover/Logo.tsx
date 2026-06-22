@@ -1,11 +1,14 @@
 export function CloverLogo({ className = "" }: { className?: string }) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <svg width="28" height="22" viewBox="0 0 28 22" fill="none">
-        <path d="M2 11 L11 2 L14 5 L8 11 L14 17 L11 20 Z" fill="#002EFF" />
-        <path d="M14 11 L23 2 L26 5 L20 11 L26 17 L23 20 Z" fill="#002EFF" />
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        {/* Cute sun + house mark */}
+        <circle cx="16" cy="16" r="14" fill="#FFC857" />
+        <path d="M7 19 L16 10 L25 19 L25 24 L7 24 Z" fill="#E8754F" />
+        <rect x="14" y="18" width="4" height="6" fill="#FFF8EE" rx="1" />
+        <path d="M16 7 V4 M6 16 H3 M26 16 H29 M9 9 L7 7 M23 9 L25 7" stroke="#E8754F" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <span className="text-[22px] font-bold tracking-tight text-ink">Solara</span>
+      <span className="text-[22px] font-extrabold tracking-tight text-ink">Solara</span>
     </div>
   );
 }

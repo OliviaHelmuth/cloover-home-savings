@@ -252,7 +252,7 @@ function MapScreen({
             <polygon
               points="160,60 280,55 290,105 170,110"
               fill="rgba(0,46,255,0.35)"
-              stroke="#002EFF"
+              stroke="#E8754F"
               strokeWidth="2"
               className="anim-pop"
             />
