@@ -803,6 +803,7 @@ export function Proposal({
         </p>
       </main>
 
+      <SiteFooter />
       <SupportChat />
     </div>
   );
