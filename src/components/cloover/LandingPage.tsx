@@ -19,6 +19,7 @@ import { CloverLogo } from "./Logo";
 import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
+import { LandingSections } from "./LandingSections";
 
 type Props = {
   inputs: HouseholdInputs;
