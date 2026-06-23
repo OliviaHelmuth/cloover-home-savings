@@ -214,7 +214,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
         </section>
 
         <section id="calculator" className="border-t border-line bg-white/70 px-5 py-14 md:px-6">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-6 max-w-3xl">
               <p className="text-xs font-extrabold uppercase tracking-wider text-cloover">
                 Start here
