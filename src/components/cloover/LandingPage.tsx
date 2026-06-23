@@ -103,6 +103,7 @@ const HERO_ASSETS = {
 export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
   const activeModules = getBaselineModules(inputs);
   const roofEstimate = getRoofEstimate(inputs);
+  const [mapOpen, setMapOpen] = useState(false);
 
   const scrollToCalculator = () => {
     document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -110,6 +111,10 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
 
   const handleCalculateClick = () => {
     onCalculate(activeModules);
+  };
+
+  const updateRoofArea = (areaM2: number) => {
+    onInputsChange({ ...inputs, userRoofAreaM2: areaM2, freeEstimate: null });
   };
 
   const updateStreet = (street: string) => {
