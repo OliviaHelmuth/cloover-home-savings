@@ -388,11 +388,20 @@ export function getLocationProfile(inputs: Pick<HouseholdInputs, "postalCode" | 
 }
 
 export function getRoofEstimate(inputs: HouseholdInputs): RoofEstimate {
-  const location = getLocationProfile(inputs);
+  const baseLocation = getLocationProfile(inputs);
+  const orientationFactor =
+    ROOF_ORIENTATION_FACTOR[inputs.roofOrientation] ?? baseLocation.orientationFactor;
+  const location: LocationProfile = {
+    ...baseLocation,
+    orientation: inputs.roofOrientation as LocationProfile["orientation"],
+    orientationFactor,
+  };
   const householdAdjustment = (inputs.householdSize - 3) * 3;
-  const usableRoofAreaM2 = inputs.freeEstimate?.usableRoofAreaM2
-    ? clamp(inputs.freeEstimate.usableRoofAreaM2, 20, 72)
-    : clamp(location.usableRoofAreaM2 + householdAdjustment, 24, 58);
+  const usableRoofAreaM2 = inputs.userRoofAreaM2
+    ? clamp(inputs.userRoofAreaM2, 8, 200)
+    : inputs.freeEstimate?.usableRoofAreaM2
+      ? clamp(inputs.freeEstimate.usableRoofAreaM2, 20, 72)
+      : clamp(baseLocation.usableRoofAreaM2 + householdAdjustment, 24, 58);
   const panelCountMax = Math.floor(usableRoofAreaM2 / PRICE_CATALOG.panelAreaM2);
   const maxKwp = (panelCountMax * PRICE_CATALOG.panelWp) / 1000;
 
