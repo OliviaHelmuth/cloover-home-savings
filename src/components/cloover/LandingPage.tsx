@@ -311,24 +311,136 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
                       className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
+              </div>
+
+              {/* Roof details */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-xs font-bold text-ink/80 flex items-center gap-1.5">
+                    <Home className="h-4 w-4 text-cloover" />
+                    Your roof
+                  </h3>
+                  <span className="text-[11px] text-muted-foreground">
+                    Estimate only — confirmed on installer site survey.
+                  </span>
                 </div>
-                <div className="rounded-2xl border border-cloover/15 bg-cloover-soft/70 px-3 py-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-white text-cloover">
+
+                {/* Roof type cards */}
+                <div>
+                  <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1.5">
+                    Roof type
+                  </label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {ROOF_TYPES.map(({ key, label }) => {
+                      const active = inputs.roofType === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => onInputsChange({ ...inputs, roofType: key })}
+                          className={`group flex flex-col items-center gap-1 rounded-2xl border-2 px-1.5 py-2 transition ${
+                            active
+                              ? "border-cloover bg-cloover-soft"
+                              : "border-line bg-white hover:border-cloover/40"
+                          }`}
+                        >
+                          <RoofTypeIcon type={key} active={active} />
+                          <span className="text-[10px] font-bold text-center leading-tight text-ink">
+                            {label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Orientation + angle */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1.5">
+                      Roof orientation
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={inputs.roofOrientation}
+                        onChange={(e) =>
+                          onInputsChange({
+                            ...inputs,
+                            roofOrientation: e.target.value as RoofOrientation,
+                          })
+                        }
+                        className="material-field w-full appearance-none px-3 py-2 pr-9 text-sm outline-none"
+                      >
+                        {ROOF_ORIENTATIONS.map((o) => (
+                          <option key={o.key} value={o.key}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
+                      <Compass className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1.5">
+                      Roof angle
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {ROOF_ANGLE_PRESETS.map((a) => {
+                        const active = inputs.roofAngle === a;
+                        return (
+                          <button
+                            key={a}
+                            onClick={() => onInputsChange({ ...inputs, roofAngle: a })}
+                            className={`flex flex-col items-center gap-1 rounded-xl border-2 py-1.5 transition ${
+                              active
+                                ? "border-ink bg-white"
+                                : "border-line bg-white/70 hover:border-ink/40"
+                            }`}
+                          >
+                            <AngleIcon angle={a} active={active} />
+                            <span className="text-[11px] font-bold text-ink">{a}°</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Draw roof on map */}
+                <div className="rounded-2xl border border-cloover/15 bg-cloover-soft/70 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-cloover">
                         <Ruler className="h-4 w-4" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs font-extrabold text-ink">Usable roof size</p>
                         <p className="text-[11px] leading-4 text-muted-foreground">
-                          For the full setup, customers will draw the usable roof area on an
-                          OpenStreetMap view.
+                          {inputs.userRoofAreaM2
+                            ? "From your drawing on the satellite map."
+                            : "Draw your roof on a satellite map for a tighter estimate."}
                         </p>
                       </div>
                     </div>
-                    <div className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-cloover">
-                      Est. {roofEstimate.usableRoofAreaM2.toFixed(0)} m² ·{" "}
-                      {roofEstimate.panelCountMax} panels
+                    <div className="flex items-center gap-2">
+                      <div className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-cloover">
+                        {inputs.userRoofAreaM2 ? "✓ " : "Est. "}
+                        {roofEstimate.usableRoofAreaM2.toFixed(0)} m² ·{" "}
+                        {roofEstimate.panelCountMax} panels
+                      </div>
+                      <button
+                        onClick={() => setMapOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-extrabold text-white shadow hover:bg-ink/90"
+                      >
+                        {inputs.userRoofAreaM2 ? (
+                          <>
+                            <Check className="h-3.5 w-3.5" /> Re-draw
+                          </>
+                        ) : (
+                          <>
+                            <Pencil className="h-3.5 w-3.5" /> Draw on map
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
