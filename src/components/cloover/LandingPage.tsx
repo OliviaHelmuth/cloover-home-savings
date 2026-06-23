@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ArrowRight,
   Sparkles,
@@ -8,22 +9,50 @@ import {
   Car,
   ChevronDown,
   Ruler,
+  Home,
+  Compass,
+  Pencil,
+  Check,
 } from "lucide-react";
 import {
   getBaselineModules,
   getRoofEstimate,
   type ModuleKey,
   type HouseholdInputs,
+  type RoofType,
+  type RoofOrientation,
 } from "@/lib/cloover-data";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
 import { LandingSections } from "./LandingSections";
+import { RoofMapModal } from "./RoofMapModal";
 
 type Props = {
   inputs: HouseholdInputs;
   onInputsChange: (inputs: HouseholdInputs) => void;
   onCalculate: (active: Set<ModuleKey>) => void;
 };
+
+const ROOF_TYPES: { key: RoofType; label: string }[] = [
+  { key: "Hip", label: "Hip roof" },
+  { key: "Flat", label: "Flat roof" },
+  { key: "Gable", label: "Gable roof" },
+  { key: "Pyramid", label: "Pyramid roof" },
+  { key: "Shed", label: "Shed roof" },
+];
+
+const ROOF_ORIENTATIONS: { key: RoofOrientation; label: string }[] = [
+  { key: "N", label: "North" },
+  { key: "NE", label: "North-East" },
+  { key: "E", label: "East" },
+  { key: "SE", label: "South-East" },
+  { key: "S", label: "South" },
+  { key: "SW", label: "South-West" },
+  { key: "W", label: "West" },
+  { key: "NW", label: "North-West" },
+];
+
+const ROOF_ANGLE_PRESETS = [0, 15, 30, 45];
 
 const ADDRESS_SUGGESTIONS = [
   { street: "Friedrichstraße", streetNumber: "12", postalCode: "10117", label: "Berlin Mitte" },
