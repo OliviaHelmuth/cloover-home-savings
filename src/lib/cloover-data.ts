@@ -111,6 +111,21 @@ export const DEFAULT_ONBOARDING: OnboardingData = {
   pricePerKwh: 0.4,
 };
 
+export type RoofType = "Hip" | "Flat" | "Gable" | "Pyramid" | "Shed";
+export type RoofOrientation = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW";
+
+export const ROOF_ORIENTATION_FACTOR: Record<RoofOrientation, number> = {
+  S: 1,
+  SE: 0.96,
+  SW: 0.96,
+  E: 0.86,
+  W: 0.86,
+  SE_E: 0.91,
+  NE: 0.7,
+  NW: 0.7,
+  N: 0.6,
+} as unknown as Record<RoofOrientation, number>;
+
 export type HouseholdInputs = {
   street: string;
   streetNumber: string;
@@ -122,6 +137,10 @@ export type HouseholdInputs = {
   carType: string;
   householdSize: number;
   yearlyEnergyConsumption: number;
+  roofType: RoofType;
+  roofOrientation: RoofOrientation;
+  roofAngle: number;
+  userRoofAreaM2?: number | null;
   freeEstimate?: FreeEnergyEstimate | null;
 };
 
@@ -162,6 +181,10 @@ export const DEFAULT_HOUSEHOLD_INPUTS: HouseholdInputs = {
   carType: "Petrol/Diesel",
   householdSize: 3,
   yearlyEnergyConsumption: 4500,
+  roofType: "Gable",
+  roofOrientation: "S",
+  roofAngle: 30,
+  userRoofAreaM2: null,
   freeEstimate: null,
 };
 
