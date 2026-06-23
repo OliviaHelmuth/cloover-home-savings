@@ -111,6 +111,20 @@ export const DEFAULT_ONBOARDING: OnboardingData = {
   pricePerKwh: 0.4,
 };
 
+export type RoofType = "Hip" | "Flat" | "Gable" | "Pyramid" | "Shed";
+export type RoofOrientation = "N" | "NE" | "E" | "SE" | "S" | "SW" | "W" | "NW";
+
+export const ROOF_ORIENTATION_FACTOR: Record<RoofOrientation, number> = {
+  S: 1,
+  SE: 0.96,
+  SW: 0.96,
+  E: 0.86,
+  W: 0.86,
+  NE: 0.7,
+  NW: 0.7,
+  N: 0.6,
+};
+
 export type HouseholdInputs = {
   street: string;
   streetNumber: string;
@@ -122,6 +136,10 @@ export type HouseholdInputs = {
   carType: string;
   householdSize: number;
   yearlyEnergyConsumption: number;
+  roofType: RoofType;
+  roofOrientation: RoofOrientation;
+  roofAngle: number;
+  userRoofAreaM2?: number | null;
   freeEstimate?: FreeEnergyEstimate | null;
 };
 
@@ -162,6 +180,10 @@ export const DEFAULT_HOUSEHOLD_INPUTS: HouseholdInputs = {
   carType: "Petrol/Diesel",
   householdSize: 3,
   yearlyEnergyConsumption: 4500,
+  roofType: "Gable",
+  roofOrientation: "S",
+  roofAngle: 30,
+  userRoofAreaM2: null,
   freeEstimate: null,
 };
 
@@ -366,11 +388,20 @@ export function getLocationProfile(inputs: Pick<HouseholdInputs, "postalCode" | 
 }
 
 export function getRoofEstimate(inputs: HouseholdInputs): RoofEstimate {
-  const location = getLocationProfile(inputs);
+  const baseLocation = getLocationProfile(inputs);
+  const orientationFactor =
+    ROOF_ORIENTATION_FACTOR[inputs.roofOrientation] ?? baseLocation.orientationFactor;
+  const location: LocationProfile = {
+    ...baseLocation,
+    orientation: inputs.roofOrientation as LocationProfile["orientation"],
+    orientationFactor,
+  };
   const householdAdjustment = (inputs.householdSize - 3) * 3;
-  const usableRoofAreaM2 = inputs.freeEstimate?.usableRoofAreaM2
-    ? clamp(inputs.freeEstimate.usableRoofAreaM2, 20, 72)
-    : clamp(location.usableRoofAreaM2 + householdAdjustment, 24, 58);
+  const usableRoofAreaM2 = inputs.userRoofAreaM2
+    ? clamp(inputs.userRoofAreaM2, 8, 200)
+    : inputs.freeEstimate?.usableRoofAreaM2
+      ? clamp(inputs.freeEstimate.usableRoofAreaM2, 20, 72)
+      : clamp(baseLocation.usableRoofAreaM2 + householdAdjustment, 24, 58);
   const panelCountMax = Math.floor(usableRoofAreaM2 / PRICE_CATALOG.panelAreaM2);
   const maxKwp = (panelCountMax * PRICE_CATALOG.panelWp) / 1000;
 
