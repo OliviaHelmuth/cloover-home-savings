@@ -311,7 +311,10 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
                       className="material-field w-full px-3 py-2 text-sm outline-none"
                     />
                   </div>
+                </div>
               </div>
+
+
 
               {/* Roof details */}
               <div className="space-y-2">
