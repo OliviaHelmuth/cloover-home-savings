@@ -621,7 +621,87 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
 
       <LandingSections />
       <SiteFooter />
+
+      <RoofMapModal
+        open={mapOpen}
+        onClose={() => setMapOpen(false)}
+        street={inputs.street}
+        streetNumber={inputs.streetNumber}
+        postalCode={inputs.postalCode}
+        initialAreaM2={inputs.userRoofAreaM2}
+        onConfirm={updateRoofArea}
+      />
     </div>
+  );
+}
+
+function RoofTypeIcon({ type, active }: { type: RoofType; active: boolean }) {
+  const body = active ? "#1F6FEB" : "#9aa0a6";
+  const fill = active ? "#dce8ff" : "#f3f4f6";
+  const stroke = active ? "#1F6FEB" : "#b9bdc2";
+  const common = { width: 44, height: 30, viewBox: "0 0 64 44" };
+  if (type === "Flat") {
+    return (
+      <svg {...common} aria-hidden>
+        <polygon points="8,24 56,24 50,32 14,32" fill={body} opacity="0.6" />
+        <rect x="14" y="30" width="36" height="8" fill={fill} stroke={stroke} />
+      </svg>
+    );
+  }
+  if (type === "Shed") {
+    return (
+      <svg {...common} aria-hidden>
+        <polygon points="8,26 56,12 56,26 14,38 8,38" fill={body} opacity="0.6" />
+        <rect x="14" y="34" width="42" height="6" fill={fill} stroke={stroke} />
+      </svg>
+    );
+  }
+  if (type === "Pyramid") {
+    return (
+      <svg {...common} aria-hidden>
+        <polygon points="8,28 32,8 56,28 32,34" fill={body} opacity="0.6" />
+        <polygon points="8,28 32,34 32,40 8,36" fill={fill} stroke={stroke} />
+      </svg>
+    );
+  }
+  if (type === "Hip") {
+    return (
+      <svg {...common} aria-hidden>
+        <polygon points="10,26 24,12 48,12 56,26 40,30 18,30" fill={body} opacity="0.6" />
+        <rect x="14" y="28" width="36" height="10" fill={fill} stroke={stroke} />
+      </svg>
+    );
+  }
+  // Gable
+  return (
+    <svg {...common} aria-hidden>
+      <polygon points="14,28 32,10 50,28 32,34" fill={body} opacity="0.6" />
+      <rect x="18" y="26" width="28" height="14" fill={fill} stroke={stroke} />
+    </svg>
+  );
+}
+
+function AngleIcon({ angle, active }: { angle: number; active: boolean }) {
+  const color = active ? "#0e1b2c" : "#9aa0a6";
+  if (angle === 0) {
+    return (
+      <svg width="40" height="14" viewBox="0 0 40 14" aria-hidden>
+        <line x1="4" y1="7" x2="36" y2="7" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  const rise = angle === 15 ? 4 : angle === 30 ? 7 : 10;
+  return (
+    <svg width="40" height="18" viewBox="0 0 40 18" aria-hidden>
+      <polyline
+        points={`4,16 20,${16 - rise} 36,16`}
+        stroke={color}
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
