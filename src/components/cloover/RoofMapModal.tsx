@@ -240,7 +240,7 @@ export function RoofMapModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-3 md:p-6">
-      <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+      <div className="relative flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div>
             <h2 className="text-lg font-extrabold text-ink md:text-xl">Draw your roof on the map</h2>
@@ -259,10 +259,10 @@ export function RoofMapModal({
         </div>
 
         <div className="relative">
-          <div ref={containerRef} className="h-[58vh] w-full bg-surface-soft" />
+          <div ref={containerRef} className="relative z-0 h-[58vh] w-full bg-surface-soft" />
 
           {/* overlays */}
-          <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
+          <div style={{position: 'absolute', inset: 0, zIndex: 2000}} className="pointer-events-none flex flex-col justify-between p-3">
             <div className="pointer-events-auto flex items-start justify-between gap-2">
               <div className="flex gap-1 rounded-full bg-white p-1 shadow">
                 <button
