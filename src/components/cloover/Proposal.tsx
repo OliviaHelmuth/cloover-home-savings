@@ -1,19 +1,15 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { jsPDF } from "jspdf";
 import {
-  Sparkles,
   Send,
   Download,
   Sun,
   Coins,
   Battery,
   MapPin,
-  MessageCircle,
-  Phone,
   Printer,
   Ruler,
   ShieldCheck,
-  X,
 } from "lucide-react";
 import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
@@ -803,117 +799,6 @@ export function Proposal({
       </main>
 
       <SiteFooter />
-      <SupportChat />
     </div>
-  );
-}
-
-// ---------------- Support chat ----------------
-
-const FAQS: { q: string; a: string }[] = [
-  {
-    q: "How accurate is the €/month saving?",
-    a: "It is a modeled estimate from your inputs (heating, electricity, mobility spend) and average regional tariffs. A final installer survey refines it within ±10–15%.",
-  },
-  {
-    q: "How does the financing work?",
-    a: "Solara bundles the equipment cost into a single monthly installment, then compares that with your modeled monthly energy saving. The proposal also shows the early years separately because the installment can outweigh the bill reduction at first.",
-  },
-  {
-    q: "What subsidies are included?",
-    a: "Federal BEG for heat pumps and KfW programs for solar/battery are pre-applied. Local municipal grants are listed during the installer survey.",
-  },
-  {
-    q: "Can I change my configuration later?",
-    a: "Yes. You can adjust the configuration anytime before signing the installer quote—your savings plan updates automatically.",
-  },
-  {
-    q: "What if my roof is shaded?",
-    a: "Shading is averaged into the irradiance figure. The installer survey verifies actual shading and may suggest module placement adjustments.",
-  },
-];
-
-function SupportChat() {
-  const [open, setOpen] = useState(false);
-  const [picked, setPicked] = useState<number | null>(null);
-
-  return (
-    <>
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-cloover text-white font-semibold shadow-2xl shadow-cloover/30 hover:bg-cloover/90"
-        >
-          <MessageCircle className="w-5 h-5" /> Ask about your plan
-        </button>
-      )}
-      {open && (
-        <div className="fixed bottom-6 right-6 z-40 w-[min(360px,calc(100vw-2rem))] bg-white rounded-3xl border border-line shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
-          <div className="bg-cloover text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/15 grid place-items-center">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-sm font-bold">Solara advisor</p>
-                <p className="text-[11px] text-white/80">Usually replies in a minute</p>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                setOpen(false);
-                setPicked(null);
-              }}
-              className="text-white/80 hover:text-white"
-              aria-label="Close chat"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-4 overflow-y-auto flex-1 space-y-3 bg-surface-soft/40">
-            <div className="bg-white rounded-2xl rounded-tl-sm border border-line p-3 text-sm">
-              Hi! I can answer questions about your savings plan, financing, or subsidies. Pick a
-              question below or reach a human advisor.
-            </div>
-            {picked !== null && (
-              <>
-                <div className="bg-cloover text-white rounded-2xl rounded-tr-sm p-3 text-sm ml-8">
-                  {FAQS[picked].q}
-                </div>
-                <div className="bg-white rounded-2xl rounded-tl-sm border border-line p-3 text-sm">
-                  {FAQS[picked].a}
-                </div>
-              </>
-            )}
-          </div>
-          <div className="border-t border-line p-3 space-y-2 bg-white">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Suggested questions
-            </p>
-            <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
-              {FAQS.map((f, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPicked(i)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                    picked === i
-                      ? "bg-cloover text-white border-cloover"
-                      : "bg-white border-line text-ink hover:border-cloover/40"
-                  }`}
-                >
-                  {f.q}
-                </button>
-              ))}
-            </div>
-            <a
-              href="tel:+498000000000"
-              className="mt-1 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-ink text-white text-sm font-semibold hover:bg-ink/90"
-            >
-              <Phone className="w-4 h-4" /> Talk to customer service
-            </a>
-          </div>
-        </div>
-      )}
-    </>
   );
 }

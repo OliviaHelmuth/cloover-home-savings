@@ -184,6 +184,37 @@
     opacity: 1;
   }
 }
+@keyframes chatPanelIn {
+  from {
+    transform: translateY(14px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes advisorPulse {
+  0%,
+  100% {
+    box-shadow: 0 18px 42px rgba(14, 27, 44, 0.24);
+  }
+  50% {
+    box-shadow: 0 18px 42px rgba(31, 111, 235, 0.32);
+  }
+}
+@keyframes typingBounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.38;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
 .anim-roof {
   animation: slideInRoof 0.5s ease-out;
 }
@@ -221,6 +252,20 @@
   animation: cutePulseScale 3.8s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
+}
+.chat-panel-smooth {
+  animation: chatPanelIn 180ms ease-out;
+}
+.advisor-launch {
+  animation: advisorPulse 3.2s ease-in-out infinite;
+}
+.typing-dot {
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--cloover-blue);
+  animation: typingBounce 900ms ease-in-out infinite;
 }
 
 .premium-bg {

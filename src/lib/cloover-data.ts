@@ -662,3 +662,15 @@ export function computeFinancialPlan(
     breakEvenYear,
   };
 }
+
+export function getRecommendedFinancingTerm(active: Set<ModuleKey>, inputs: HouseholdInputs) {
+  const scenario = computeDynamicScenario(active, inputs);
+  const financedAmount = scenario.capex.afterSubsidy;
+
+  if (financedAmount <= 0) return 0;
+  if (financedAmount <= 7000) return 5;
+  if (financedAmount <= 12000) return 8;
+  if (financedAmount <= 20000) return 10;
+  if (financedAmount <= 30000) return 12;
+  return 15;
+}

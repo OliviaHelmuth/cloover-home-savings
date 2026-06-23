@@ -15,7 +15,6 @@ import {
   type ModuleKey,
   type HouseholdInputs,
 } from "@/lib/cloover-data";
-import { ProgressSteps } from "./ProgressSteps";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
 import { LandingSections } from "./LandingSections";
@@ -24,7 +23,6 @@ type Props = {
   inputs: HouseholdInputs;
   onInputsChange: (inputs: HouseholdInputs) => void;
   onCalculate: (active: Set<ModuleKey>) => void;
-  onStepSelect: (step: 1 | 2 | 3, active: Set<ModuleKey>) => void;
 };
 
 const ADDRESS_SUGGESTIONS = [
@@ -65,9 +63,21 @@ function annualValue(monthlyValue: number) {
   return Math.round(monthlyValue * 12);
 }
 
-export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect }: Props) {
+const HERO_ASSETS = {
+  house: "/cloover-assets/house-cloover.png",
+  solar: "/cloover-assets/solar-cloover.png",
+  battery: "/cloover-assets/battery-cloover.png",
+  heatPump: "/cloover-assets/heat-pump-cloover.png",
+  car: "/cloover-assets/car-cloover.png",
+};
+
+export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
   const activeModules = getBaselineModules(inputs);
   const roofEstimate = getRoofEstimate(inputs);
+
+  const scrollToCalculator = () => {
+    document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleCalculateClick = () => {
     onCalculate(activeModules);
@@ -119,33 +129,81 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
 
   return (
     <div className="min-h-screen bg-surface text-ink premium-bg">
-      <SiteHeader onCta={handleCalculateClick} />
-      <ProgressSteps activeStep={1} onStepSelect={(step) => onStepSelect(step, activeModules)} />
+      <SiteHeader />
 
       <main>
-        <section className="mx-auto grid min-h-[calc(100svh-135px)] max-w-7xl items-center gap-6 px-5 py-3 md:px-6 lg:h-[calc(100svh-135px)] lg:min-h-0 lg:grid-cols-[0.82fr_1.18fr]">
+        <section className="mx-auto grid min-h-[calc(100svh-70px)] max-w-7xl items-center gap-10 px-5 py-10 md:px-6 lg:h-[calc(100svh-70px)] lg:min-h-[620px] lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <h1 className="max-w-3xl text-4xl font-extrabold leading-[0.98] md:text-5xl xl:text-6xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cloover/20 bg-white px-3 py-1.5 text-xs font-extrabold text-cloover shadow-sm">
+              <Sparkles className="h-3.5 w-3.5" />
+              One home upgrade. One monthly outcome.
+            </div>
+            <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[0.98] md:text-5xl xl:text-6xl">
               Green energy isn't just cleaner.
-              <span className="mt-3 block text-cloover">It's cheaper in the long run.</span>
+              <br />
+              It's cheaper in the long run.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground xl:text-lg xl:leading-8">
-              One smart plan. Years of lower energy costs. We’ll build the right setup of solar,
-              batteries, heating and EV charging that works best for your home.
+              Solara compares your current electricity, heating and mobility costs with a financed
+              package of solar, battery, heat pump and EV charging. The number we put front and
+              center is simple: how much lower your monthly household costs become after the loan is
+              paid off.
             </p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Start with a few home details, then play with the configurator to see how each upgrade
+              changes the offer, the loan period and your long-term savings.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <button
+                onClick={scrollToCalculator}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-cloover/25 transition hover:-translate-y-0.5 hover:bg-cloover/90"
+              >
+                Calculate my savings <ArrowRight className="h-4 w-4" />
+              </button>
+              <a
+                href="#how"
+                className="inline-flex items-center justify-center rounded-full border border-line bg-white px-6 py-3 text-sm font-extrabold text-ink transition hover:border-cloover/40 hover:text-cloover"
+              >
+                How it works
+              </a>
+            </div>
+
+            <div className="mt-7 grid max-w-2xl gap-3 sm:grid-cols-3">
+              <HeroStat label="Inputs" value="90 sec" />
+              <HeroStat label="Modeled upgrades" value="4" />
+              <HeroStat label="Installer-ready" value="PDF" />
+            </div>
           </div>
 
-          <div>
+          <HeroEnergyPreview />
+        </section>
+
+        <section id="calculator" className="border-t border-line bg-white/70 px-5 py-14 md:px-6">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-6 max-w-3xl">
+              <p className="text-xs font-extrabold uppercase tracking-wider text-cloover">
+                Start here
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold md:text-4xl">Tell us about your home.</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground md:text-base">
+                We use these details to estimate roof size, current monthly spend and which upgrade
+                combination should save the most over time.
+              </p>
+            </div>
+
             {/* Household inputs calculator */}
-            <div className="space-y-2.5 rounded-[20px] border border-line bg-white p-4 shadow-2xl">
-              <div className="flex items-center justify-between gap-3 border-b border-line pb-2">
+            <div className="space-y-4 rounded-[28px] border border-line bg-white p-5 shadow-2xl md:p-7">
+              <div className="flex items-center justify-between gap-3 border-b border-line pb-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-cloover" />
+                  <Sparkles className="h-5 w-5 text-cloover" />
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wide text-cloover">
                       Savings calculator
                     </p>
-                    <h2 className="text-lg font-extrabold text-ink">Tell us about your home</h2>
+                    <h3 className="text-xl font-extrabold text-ink">
+                      Your current household profile
+                    </h3>
                   </div>
                 </div>
               </div>
@@ -414,6 +472,116 @@ export function LandingPage({ inputs, onInputsChange, onCalculate, onStepSelect 
 
       <LandingSections />
       <SiteFooter />
+    </div>
+  );
+}
+
+function HeroStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-line bg-white px-4 py-3 shadow-sm">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xl font-extrabold text-ink">{value}</p>
+    </div>
+  );
+}
+
+function HeroEnergyPreview() {
+  return (
+    <div className="relative mx-auto w-full max-w-[680px]">
+      <div className="absolute -left-4 top-12 hidden rounded-full bg-white px-4 py-2 text-xs font-extrabold text-cloover shadow-xl shadow-cloover/10 md:block z-10">
+        Live savings preview
+      </div>
+
+      <div className="relative overflow-hidden rounded-[34px] border border-line bg-gradient-to-br from-cloover-soft via-white to-surface-soft p-5 shadow-2xl md:p-8">
+        <div className="absolute right-8 top-8 rounded-2xl bg-white px-4 py-2 text-right shadow-sm">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+            After loan
+          </p>
+          <p className="text-2xl font-extrabold text-cloover">€275/mo saved</p>
+        </div>
+
+        <div className="relative min-h-[430px]">
+          <img
+            src={HERO_ASSETS.solar}
+            alt="Cute solar panels"
+            className="cute-float-slow absolute left-0 top-0 w-36 drop-shadow-xl md:w-44"
+          />
+          <img
+            src={HERO_ASSETS.house}
+            alt="Cute home energy setup"
+            className="cute-house-bob absolute left-1/2 top-20 w-[78%] max-w-[500px] -translate-x-1/2 drop-shadow-2xl"
+          />
+          <img
+            src={HERO_ASSETS.battery}
+            alt="Cute home battery"
+            className="absolute right-6 top-48 w-20 drop-shadow-xl md:w-24"
+          />
+          <img
+            src={HERO_ASSETS.heatPump}
+            alt="Cute heat pump"
+            className="absolute bottom-8 left-0 w-28 drop-shadow-xl md:w-36"
+          />
+          <img
+            src={HERO_ASSETS.car}
+            alt="Cute electric vehicle"
+            className="absolute bottom-0 right-0 w-40 drop-shadow-xl md:w-52"
+          />
+
+          <svg
+            viewBox="0 0 620 420"
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            aria-hidden="true"
+          >
+            <path
+              d="M126 120 C190 168 226 220 302 250"
+              fill="none"
+              stroke="#7CFF30"
+              strokeLinecap="round"
+              strokeWidth="6"
+              className="cute-flow"
+            />
+            <path
+              d="M500 238 C448 242 408 252 354 270"
+              fill="none"
+              stroke="#7CFF30"
+              strokeLinecap="round"
+              strokeWidth="6"
+              className="cute-flow"
+            />
+            <path
+              d="M114 356 C176 340 236 310 300 278"
+              fill="none"
+              stroke="#7CFF30"
+              strokeLinecap="round"
+              strokeWidth="6"
+              className="cute-flow"
+            />
+            <path
+              d="M508 342 C452 322 402 300 342 278"
+              fill="none"
+              stroke="#7CFF30"
+              strokeLinecap="round"
+              strokeWidth="6"
+              className="cute-flow"
+            />
+          </svg>
+        </div>
+
+        <div className="grid gap-3 border-t border-line pt-4 sm:grid-cols-3">
+          <HeroMiniMetric label="Roof estimate" value="38 m² usable" />
+          <HeroMiniMetric label="Loan paid off" value="Year 8-12" />
+          <HeroMiniMetric label="Proposal" value="Installer-ready" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HeroMiniMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-extrabold text-ink">{value}</p>
     </div>
   );
 }

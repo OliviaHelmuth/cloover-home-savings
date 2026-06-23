@@ -1,4 +1,4 @@
-import { Menu, Sun } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import { CloverLogo } from "./Logo";
 
@@ -10,12 +10,17 @@ const NAV_ITEMS = [
   { label: "FAQ", href: "/#faq" },
 ];
 
-export function SiteHeader({ onCta }: { onCta?: () => void }) {
+export function SiteHeader() {
   const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 md:px-6">
-        <a href="/" className="flex items-center">
+        <a
+          href="/"
+          className="flex shrink-0 items-center rounded-full outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-cloover focus-visible:ring-offset-2"
+          aria-label="Go to Solara landing page"
+        >
           <CloverLogo />
         </a>
         <nav className="hidden items-center gap-1 lg:flex">
@@ -36,12 +41,6 @@ export function SiteHeader({ onCta }: { onCta?: () => void }) {
           >
             ☎ 0800 000 000
           </a>
-          <button
-            onClick={onCta}
-            className="inline-flex items-center gap-1.5 rounded-full bg-cloover px-4 py-2 text-sm font-extrabold text-white shadow-md shadow-cloover/25 transition hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            <Sun className="h-4 w-4" /> Get my plan
-          </button>
           <button
             onClick={() => setOpen((v) => !v)}
             className="grid h-9 w-9 place-items-center rounded-full border border-line bg-white text-ink lg:hidden"

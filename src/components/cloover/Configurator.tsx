@@ -391,9 +391,7 @@ export function Configurator({
                   </span>
                   <span className="text-sm font-bold text-cloover">/mo</span>
                 </div>
-                <p className="mt-1 text-sm font-bold text-cloover">
-                  from year {financialPlan.termYears + 1}, once the loan is paid off
-                </p>
+                <p className="mt-1 text-sm font-bold text-cloover">once the loan is paid off</p>
               </div>
               {isCurrentSetup ? (
                 <div className="mt-2 rounded-2xl border border-line bg-surface-soft px-3 py-2.5 text-sm text-muted-foreground">
@@ -442,16 +440,14 @@ export function Configurator({
                   </div>
                   <div className="mt-2 rounded-xl bg-surface-soft px-3 py-2">
                     <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                      Cumulative break-even
+                      Loan paid off
                     </p>
                     <p className="mt-0.5 text-sm font-extrabold text-ink">
-                      {financialPlan.breakEvenYear > 0
-                        ? `Year ${financialPlan.breakEvenYear}`
-                        : "No upgrade selected"}
+                      After year {financialPlan.termYears}
                     </p>
                     <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
-                      The point where cumulative Solara spending becomes lower than staying with the
-                      current setup.
+                      From year {financialPlan.termYears + 1}, the model estimates €
+                      {monthlySaving.toLocaleString()}/mo lower household costs.
                     </p>
                   </div>
                 </div>

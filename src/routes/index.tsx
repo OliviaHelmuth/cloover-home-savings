@@ -5,9 +5,11 @@ import { Onboarding } from "@/components/cloover/Onboarding";
 import { Configurator } from "@/components/cloover/Configurator";
 import { Proposal } from "@/components/cloover/Proposal";
 import { LoadingTransition } from "@/components/cloover/LoadingTransition";
+import { AdvisorPet } from "@/components/cloover/AdvisorPet";
 import {
   DEFAULT_HOUSEHOLD_INPUTS,
   getBaselineModules,
+  getRecommendedFinancingTerm,
   getRoofEstimate,
   type ModuleKey,
   type HouseholdInputs,
@@ -87,7 +89,7 @@ function Index() {
   const [activeModules, setActiveModules] = useState<Set<ModuleKey>>(
     getBaselineModules(DEFAULT_HOUSEHOLD_INPUTS),
   );
-  const financingTerm = 10;
+  const financingTerm = getRecommendedFinancingTerm(activeModules, householdInputs);
   const roofEstimate = getRoofEstimate(householdInputs);
 
   const goTo = (nextStep: Stage) => {
@@ -119,7 +121,6 @@ function Index() {
           inputs={householdInputs}
           onInputsChange={setHouseholdInputs}
           onCalculate={handleCalculate}
-          onStepSelect={handleStepSelect}
         />
       )}
       {step === "loading-configurator" && (
@@ -190,7 +191,7 @@ function Index() {
             },
             {
               label: "Loan term and installment",
-              value: `${financingTerm}-year loan selected`,
+              value: financingTerm > 0 ? `${financingTerm}-year loan selected` : "No loan needed",
               detail:
                 "The report separates the monthly cost while the loan is active from the saving after the loan is paid off.",
             },
@@ -226,6 +227,7 @@ function Index() {
           }}
         />
       )}
+      <AdvisorPet onStart={() => handleStepSelect(2)} />
     </>
   );
 }
