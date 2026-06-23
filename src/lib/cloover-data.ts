@@ -120,11 +120,10 @@ export const ROOF_ORIENTATION_FACTOR: Record<RoofOrientation, number> = {
   SW: 0.96,
   E: 0.86,
   W: 0.86,
-  SE_E: 0.91,
   NE: 0.7,
   NW: 0.7,
   N: 0.6,
-} as unknown as Record<RoofOrientation, number>;
+};
 
 export type HouseholdInputs = {
   street: string;
