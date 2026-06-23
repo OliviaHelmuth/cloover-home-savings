@@ -74,12 +74,12 @@ export function RoofMapModal({
       maxZoom: 21,
       attribution: "Imagery © Esri",
     }).addTo(map);
-    const street = L.tileLayer(STREET_TILES, {
+    const streetLayer = L.tileLayer(STREET_TILES, {
       maxZoom: 19,
       attribution: "© OpenStreetMap",
     });
     layersRef.current.tileSat = sat;
-    layersRef.current.tileStreet = street;
+    layersRef.current.tileStreet = streetLayer;
     mapRef.current = map;
 
     map.on("click", (e: L.LeafletMouseEvent) => {
