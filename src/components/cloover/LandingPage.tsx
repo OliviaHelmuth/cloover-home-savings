@@ -333,7 +333,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
                   <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1.5">
                     Roof type
                   </label>
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                     {ROOF_TYPES.map(({ key, label }) => {
                       const active = inputs.roofType === key;
                       return (
