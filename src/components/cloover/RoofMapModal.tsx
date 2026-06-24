@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+import type * as LeafletNS from "leaflet";
 import { X, Pencil, Undo2, Check, Loader2, MapPin } from "lucide-react";
+
+type L = typeof LeafletNS;
+// Loaded lazily on the client to avoid SSR `window is not defined` (leaflet references window at import).
+let leafletPromise: Promise<L> | null = null;
+function loadLeaflet(): Promise<L> {
+  if (!leafletPromise) {
+    leafletPromise = import("leaflet").then((m) => (m as unknown as { default: L }).default ?? (m as unknown as L));
+  }
+  return leafletPromise;
+}
 
 type Props = {
   open: boolean;
