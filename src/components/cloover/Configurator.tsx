@@ -188,21 +188,21 @@ export function Configurator({
   return (
     <div className="min-h-screen bg-surface-soft">
       {/* Announcement bar */}
-      <div className="bg-cloover text-white text-xs md:text-sm py-2 text-center">
+      <div className="hidden bg-cloover py-2 text-center text-xs text-white md:block md:text-sm">
         New: live monthly savings preview. 500+ installer partners. 10,000+ projects financed.
       </div>
 
       <SiteHeader />
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
-      <main className="mx-auto max-w-[1680px] px-2 py-2 md:px-3">
+      <main className="mx-auto max-w-[1680px] px-2 py-2 pb-24 md:px-3 lg:pb-2">
         <section className="grid gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
-          <aside className="bg-white rounded-[22px] border border-line p-2.5 h-fit lg:sticky lg:top-24">
+          <aside className="rounded-[22px] border border-line bg-white p-2.5 h-fit lg:sticky lg:top-24">
             <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
               Upgrade options
             </p>
             <h3 className="text-base font-bold">Select one or more</h3>
-            <div className="mt-2 grid gap-1.5">
+            <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:grid lg:gap-1.5 lg:overflow-visible lg:px-0 lg:pb-0">
               <button
                 data-testid="scenario-current"
                 onClick={clearModules}
