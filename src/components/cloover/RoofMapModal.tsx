@@ -201,14 +201,18 @@ export function RoofMapModal({
       layers.polygon = null;
     }
     if (layers.points.length >= 2) {
-      layers.line = L.polyline(layers.points, {
+      const Lmod = leafletRef.current;
+      if (!Lmod) return;
+      layers.line = Lmod.polyline(layers.points, {
         color: "#1F6FEB",
         weight: 3,
         dashArray: "6 6",
       }).addTo(map);
     }
     if (layers.points.length >= 3) {
-      layers.polygon = L.polygon(layers.points, {
+      const Lmod = leafletRef.current;
+      if (!Lmod) return;
+      layers.polygon = Lmod.polygon(layers.points, {
         color: "#1F6FEB",
         weight: 2,
         fillColor: "#1F6FEB",
