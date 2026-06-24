@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import type * as LeafletNS from "leaflet";
+import type * as L from "leaflet";
 import { X, Pencil, Undo2, Check, Loader2, MapPin } from "lucide-react";
 
-type L = typeof LeafletNS;
-// Loaded lazily on the client to avoid SSR `window is not defined` (leaflet references window at import).
-let leafletPromise: Promise<L> | null = null;
-function loadLeaflet(): Promise<L> {
+// Loaded lazily on the client to avoid SSR `window is not defined`.
+type LeafletModule = typeof import("leaflet");
+let leafletPromise: Promise<LeafletModule> | null = null;
+function loadLeaflet(): Promise<LeafletModule> {
   if (!leafletPromise) {
-    leafletPromise = import("leaflet").then((m) => (m as unknown as { default: L }).default ?? (m as unknown as L));
+    leafletPromise = import("leaflet").then((m) => (m as unknown as { default: LeafletModule }).default ?? m);
   }
   return leafletPromise;
 }
