@@ -56,16 +56,16 @@ type ScenarioDef = { key: string; label: string; modules: ModuleKey[] };
 
 const SCENARIO_DEFS: ScenarioDef[] = [
   { key: "current", label: "Current setup", modules: [] },
-  { key: "solar", label: "Electricity", modules: ["solar"] },
-  { key: "solar_battery", label: "Electricity + Battery", modules: ["solar", "battery"] },
+  { key: "solar", label: "Solar only", modules: ["solar"] },
+  { key: "solar_battery", label: "Solar + Battery", modules: ["solar", "battery"] },
   {
     key: "full_home",
-    label: "Electricity + Battery + Heating",
+    label: "Solar + Battery + Heat pump",
     modules: ["solar", "battery", "heatpump"],
   },
   {
     key: "full_mobility",
-    label: "Full home + Mobility",
+    label: "Solar + Battery + Heat pump + EV",
     modules: ["solar", "battery", "heatpump", "ev"],
   },
 ];
