@@ -721,39 +721,39 @@ function HeroEnergyPreview() {
         Live savings preview
       </div>
 
-      <div className="relative overflow-hidden rounded-[34px] border border-line bg-gradient-to-br from-cloover-soft via-white to-surface-soft p-5 shadow-2xl md:p-8">
-        <div className="absolute right-8 top-8 rounded-2xl bg-white px-4 py-2 text-right shadow-sm">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+      <div className="relative overflow-hidden rounded-[28px] border border-line bg-gradient-to-br from-cloover-soft via-white to-surface-soft p-3 shadow-xl md:rounded-[34px] md:p-5 md:shadow-2xl lg:p-8">
+        <div className="absolute right-3 top-3 rounded-xl bg-white px-2.5 py-1.5 text-right shadow-sm md:right-8 md:top-8 md:rounded-2xl md:px-4 md:py-2">
+          <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground md:text-[10px]">
             After loan
           </p>
-          <p className="text-2xl font-extrabold text-cloover">€275/mo saved</p>
+          <p className="text-base font-extrabold text-cloover md:text-2xl">€275/mo saved</p>
         </div>
 
-        <div className="relative min-h-[430px]">
+        <div className="relative min-h-[230px] sm:min-h-[300px] md:min-h-[380px] lg:min-h-[430px]">
           <img
             src={HERO_ASSETS.solar}
             alt="Cute solar panels"
-            className="cute-float-slow absolute left-0 top-0 w-36 drop-shadow-xl md:w-44"
+            className="cute-float-slow absolute left-0 top-0 w-20 drop-shadow-xl sm:w-28 md:w-36 lg:w-44"
           />
           <img
             src={HERO_ASSETS.house}
             alt="Cute home energy setup"
-            className="cute-house-bob absolute left-1/2 top-20 w-[78%] max-w-[500px] -translate-x-1/2 drop-shadow-2xl"
+            className="cute-house-bob absolute left-1/2 top-10 w-[72%] max-w-[500px] -translate-x-1/2 drop-shadow-2xl sm:top-16 md:top-20"
           />
           <img
             src={HERO_ASSETS.battery}
             alt="Cute home battery"
-            className="absolute right-6 top-48 w-20 drop-shadow-xl md:w-24"
+            className="absolute right-2 top-24 w-12 drop-shadow-xl sm:right-4 sm:top-32 sm:w-16 md:w-20 lg:w-24"
           />
           <img
             src={HERO_ASSETS.heatPump}
             alt="Cute heat pump"
-            className="absolute bottom-8 left-0 w-28 drop-shadow-xl md:w-36"
+            className="absolute bottom-4 left-0 w-16 drop-shadow-xl sm:w-20 md:w-28 lg:w-36"
           />
           <img
             src={HERO_ASSETS.car}
             alt="Cute electric vehicle"
-            className="absolute bottom-0 right-0 w-40 drop-shadow-xl md:w-52"
+            className="absolute bottom-0 right-0 w-24 drop-shadow-xl sm:w-32 md:w-40 lg:w-52"
           />
 
           <svg
@@ -796,7 +796,7 @@ function HeroEnergyPreview() {
           </svg>
         </div>
 
-        <div className="grid gap-3 border-t border-line pt-4 sm:grid-cols-3">
+        <div className="mt-2 hidden gap-3 border-t border-line pt-3 sm:grid sm:grid-cols-3 md:mt-0 md:pt-4">
           <HeroMiniMetric label="Roof estimate" value="38 m² usable" />
           <HeroMiniMetric label="Loan paid off" value="Year 8-12" />
           <HeroMiniMetric label="Proposal" value="Installer-ready" />
