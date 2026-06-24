@@ -468,6 +468,28 @@ export function Configurator({
           </aside>
         </section>
       </main>
+
+      {/* Sticky mobile savings + CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-3 py-2 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-[10px] font-bold uppercase tracking-wide text-cloover">
+              Est. monthly saving after loan
+            </p>
+            <p className="text-xl font-extrabold text-cloover leading-tight">
+              €<CountUp value={monthlySaving} />
+              <span className="text-xs font-bold">/mo</span>
+            </p>
+          </div>
+          <button
+            onClick={onReview}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-cloover px-4 py-2.5 text-sm font-extrabold text-white shadow hover:bg-cloover/90"
+          >
+            Review offer <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
       <SiteFooter />
     </div>
   );
