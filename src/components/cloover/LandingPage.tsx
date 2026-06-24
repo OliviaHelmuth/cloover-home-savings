@@ -166,44 +166,44 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
       <SiteHeader />
 
       <main>
-        <section className="mx-auto grid min-h-[calc(100svh-70px)] max-w-7xl items-center gap-10 px-5 py-10 md:px-6 lg:h-[calc(100svh-70px)] lg:min-h-[620px] lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="mx-auto grid max-w-7xl items-center gap-8 px-4 pb-10 pt-8 md:gap-10 md:px-6 md:pb-14 md:pt-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12 lg:py-14">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cloover/20 bg-white px-3 py-1.5 text-xs font-extrabold text-cloover shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
               One home upgrade. One monthly outcome.
             </div>
-            <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[0.98] md:text-5xl xl:text-6xl">
+            <h1 className="mt-4 max-w-3xl text-3xl font-extrabold leading-[1.05] sm:text-4xl md:text-5xl xl:text-6xl">
               Green energy isn't just cleaner.
-              <br />
-              It's cheaper in the long run.
+              <br className="hidden sm:inline" />
+              {" "}It's cheaper in the long run.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground xl:text-lg xl:leading-8">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base md:leading-7 xl:text-lg xl:leading-8">
               Solara compares your current electricity, heating and mobility costs with a financed
               package of solar, battery, heat pump and EV charging. The number we put front and
               center is simple: how much lower your monthly household costs become after the loan is
               paid off.
             </p>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+            <p className="mt-3 hidden max-w-2xl text-sm leading-6 text-muted-foreground md:block">
               Start with a few home details, then play with the configurator to see how each upgrade
               changes the offer, the loan period and your long-term savings.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-2.5 md:mt-7 md:gap-3">
               <button
                 onClick={scrollToCalculator}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-cloover/25 transition hover:-translate-y-0.5 hover:bg-cloover/90"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-cloover px-5 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-cloover/25 transition hover:-translate-y-0.5 hover:bg-cloover/90 md:px-6 md:py-3"
               >
                 Calculate my savings <ArrowRight className="h-4 w-4" />
               </button>
               <a
                 href="#how"
-                className="inline-flex items-center justify-center rounded-full border border-line bg-white px-6 py-3 text-sm font-extrabold text-ink transition hover:border-cloover/40 hover:text-cloover"
+                className="inline-flex items-center justify-center rounded-full border border-line bg-white px-5 py-2.5 text-sm font-extrabold text-ink transition hover:border-cloover/40 hover:text-cloover md:px-6 md:py-3"
               >
                 How it works
               </a>
             </div>
 
-            <div className="mt-7 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <div className="mt-5 hidden max-w-2xl gap-3 sm:grid sm:grid-cols-3 md:mt-7">
               <HeroStat label="Inputs" value="90 sec" />
               <HeroStat label="Modeled upgrades" value="4" />
               <HeroStat label="Installer-ready" value="PDF" />
@@ -213,7 +213,7 @@ export function LandingPage({ inputs, onInputsChange, onCalculate }: Props) {
           <HeroEnergyPreview />
         </section>
 
-        <section id="calculator" className="border-t border-line bg-white/70 px-5 py-14 md:px-6">
+        <section id="calculator" className="border-t border-line bg-white/70 px-4 py-10 md:px-6 md:py-14">
           <div className="mx-auto max-w-6xl">
             <div className="mb-6 max-w-3xl">
               <p className="text-xs font-extrabold uppercase tracking-wider text-cloover">
