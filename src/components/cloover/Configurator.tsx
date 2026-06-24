@@ -206,7 +206,7 @@ export function Configurator({
               <button
                 data-testid="scenario-current"
                 onClick={clearModules}
-                className={`group rounded-[16px] border-2 p-2.5 text-left transition ${
+                className={`group shrink-0 min-w-[200px] lg:min-w-0 rounded-[16px] border-2 p-2.5 text-left transition ${
                   isCurrentSetup
                     ? "border-ink bg-ink text-white shadow-lg shadow-ink/15"
                     : "border-line bg-surface-soft text-ink hover:border-ink/40"
