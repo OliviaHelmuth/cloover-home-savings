@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+import type * as L from "leaflet";
 import { X, Pencil, Undo2, Check, Loader2, MapPin } from "lucide-react";
+
+// Loaded lazily on the client to avoid SSR `window is not defined`.
+type LeafletModule = typeof import("leaflet");
+let leafletPromise: Promise<LeafletModule> | null = null;
+function loadLeaflet(): Promise<LeafletModule> {
+  if (!leafletPromise) {
+    leafletPromise = import("leaflet").then((m) => (m as unknown as { default: LeafletModule }).default ?? m);
+  }
+  return leafletPromise;
+}
 
 type Props = {
   open: boolean;
@@ -61,50 +71,60 @@ export function RoofMapModal({
   const [geocoding, setGeocoding] = useState(false);
   const [addressLabel, setAddressLabel] = useState<string>("");
 
+  const leafletRef = useRef<LeafletModule | null>(null);
+
   // initialise the map once when opened
   useEffect(() => {
     if (!open || !containerRef.current || mapRef.current) return;
-    const map = L.map(containerRef.current, {
-      center: [52.516, 13.388],
-      zoom: 19,
-      zoomControl: true,
-      maxZoom: 21,
-    });
-    const sat = L.tileLayer(SAT_TILES, {
-      maxZoom: 21,
-      attribution: "Imagery © Esri",
-    }).addTo(map);
-    const streetLayer = L.tileLayer(STREET_TILES, {
-      maxZoom: 19,
-      attribution: "© OpenStreetMap",
-    });
-    layersRef.current.tileSat = sat;
-    layersRef.current.tileStreet = streetLayer;
-    mapRef.current = map;
-
-    map.on("click", (e: L.LeafletMouseEvent) => {
-      const layers = layersRef.current;
-      if (!drawingRef.current) return;
-      layers.points.push(e.latlng);
-      const marker = L.circleMarker(e.latlng, {
-        radius: 6,
-        color: "#1F6FEB",
-        weight: 2,
-        fillColor: "#fff",
-        fillOpacity: 1,
+    let cancelled = false;
+    loadLeaflet().then((Lmod) => {
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      leafletRef.current = Lmod;
+      const map = Lmod.map(containerRef.current, {
+        center: [52.516, 13.388],
+        zoom: 19,
+        zoomControl: true,
+        maxZoom: 21,
+      });
+      const sat = Lmod.tileLayer(SAT_TILES, {
+        maxZoom: 21,
+        attribution: "Imagery © Esri",
       }).addTo(map);
-      layers.markers.push(marker);
-      redraw();
-    });
+      const streetLayer = Lmod.tileLayer(STREET_TILES, {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      });
+      layersRef.current.tileSat = sat;
+      layersRef.current.tileStreet = streetLayer;
+      mapRef.current = map;
 
-    map.on("dblclick", () => {
-      if (drawingRef.current && layersRef.current.points.length >= 3) {
-        finish();
-      }
-    });
-    map.doubleClickZoom.disable();
+      map.on("click", (e: L.LeafletMouseEvent) => {
+        const layers = layersRef.current;
+        if (!drawingRef.current) return;
+        layers.points.push(e.latlng);
+        const marker = Lmod.circleMarker(e.latlng, {
+          radius: 6,
+          color: "#1F6FEB",
+          weight: 2,
+          fillColor: "#fff",
+          fillOpacity: 1,
+        }).addTo(map);
+        layers.markers.push(marker);
+        redraw();
+      });
 
-    setTimeout(() => map.invalidateSize(), 50);
+      map.on("dblclick", () => {
+        if (drawingRef.current && layersRef.current.points.length >= 3) {
+          finish();
+        }
+      });
+      map.doubleClickZoom.disable();
+
+      setTimeout(() => map.invalidateSize(), 50);
+    });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -181,14 +201,18 @@ export function RoofMapModal({
       layers.polygon = null;
     }
     if (layers.points.length >= 2) {
-      layers.line = L.polyline(layers.points, {
+      const Lmod = leafletRef.current;
+      if (!Lmod) return;
+      layers.line = Lmod.polyline(layers.points, {
         color: "#1F6FEB",
         weight: 3,
         dashArray: "6 6",
       }).addTo(map);
     }
     if (layers.points.length >= 3) {
-      layers.polygon = L.polygon(layers.points, {
+      const Lmod = leafletRef.current;
+      if (!Lmod) return;
+      layers.polygon = Lmod.polygon(layers.points, {
         color: "#1F6FEB",
         weight: 2,
         fillColor: "#1F6FEB",

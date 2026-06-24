@@ -188,25 +188,25 @@ export function Configurator({
   return (
     <div className="min-h-screen bg-surface-soft">
       {/* Announcement bar */}
-      <div className="bg-cloover text-white text-xs md:text-sm py-2 text-center">
+      <div className="hidden bg-cloover py-2 text-center text-xs text-white md:block md:text-sm">
         New: live monthly savings preview. 500+ installer partners. 10,000+ projects financed.
       </div>
 
       <SiteHeader />
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
-      <main className="mx-auto max-w-[1680px] px-2 py-2 md:px-3">
+      <main className="mx-auto max-w-[1680px] px-2 py-2 pb-24 md:px-3 lg:pb-2">
         <section className="grid gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
-          <aside className="bg-white rounded-[22px] border border-line p-2.5 h-fit lg:sticky lg:top-24">
+          <aside className="rounded-[22px] border border-line bg-white p-2.5 h-fit lg:sticky lg:top-24">
             <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
               Upgrade options
             </p>
             <h3 className="text-base font-bold">Select one or more</h3>
-            <div className="mt-2 grid gap-1.5">
+            <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:grid lg:gap-1.5 lg:overflow-visible lg:px-0 lg:pb-0">
               <button
                 data-testid="scenario-current"
                 onClick={clearModules}
-                className={`group rounded-[16px] border-2 p-2.5 text-left transition ${
+                className={`group shrink-0 min-w-[200px] lg:min-w-0 rounded-[16px] border-2 p-2.5 text-left transition ${
                   isCurrentSetup
                     ? "border-ink bg-ink text-white shadow-lg shadow-ink/15"
                     : "border-line bg-surface-soft text-ink hover:border-ink/40"
@@ -264,7 +264,7 @@ export function Configurator({
                     draggable={!disabled}
                     onDragStart={(e) => e.dataTransfer.setData("module", option.key)}
                     onClick={() => toggleModule(option.key)}
-                    className={`group rounded-[16px] border-2 p-2 text-left transition ${
+                    className={`group shrink-0 min-w-[200px] lg:min-w-0 rounded-[16px] border-2 p-2 text-left transition ${
                       on
                         ? "border-cloover bg-cloover text-white shadow-lg shadow-cloover/20"
                         : disabled
@@ -345,27 +345,27 @@ export function Configurator({
               draggingOver ? "border-cloover bg-cloover-soft/40" : "border-line"
             }`}
           >
-            <div className="mb-1 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mb-1 grid gap-2 grid-cols-2 xl:grid-cols-4">
               {transparencyChecks.map((check) => (
-                <div key={check.label} className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                <div key={check.label} className="rounded-2xl bg-white px-2.5 py-1.5 shadow-sm md:px-3 md:py-2">
                   <div className="flex items-center gap-2">
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-cloover-soft text-cloover">
-                      <check.icon className="h-4 w-4" />
+                    <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-cloover-soft text-cloover md:h-8 md:w-8">
+                      <check.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-[11px] font-bold uppercase tracking-wide text-cloover">
+                      <p className="truncate text-[10px] font-bold uppercase tracking-wide text-cloover md:text-[11px]">
                         {check.label}
                       </p>
-                      <p className="truncate text-xs font-extrabold text-ink">{check.value}</p>
+                      <p className="truncate text-[11px] font-extrabold text-ink md:text-xs">{check.value}</p>
                     </div>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
+                  <p className="mt-1 hidden line-clamp-2 text-[11px] leading-4 text-muted-foreground md:block">
                     {check.detail}
                   </p>
                 </div>
               ))}
             </div>
-            <div className="relative h-[calc(100svh-220px)] min-h-[360px] overflow-hidden rounded-[18px] bg-surface-soft">
+            <div className="relative h-[240px] sm:h-[320px] lg:h-[calc(100svh-220px)] lg:min-h-[360px] overflow-hidden rounded-[18px] bg-surface-soft">
               <div className="absolute inset-0 flex items-center justify-center">
                 <HouseScene active={active} />
               </div>
@@ -468,6 +468,28 @@ export function Configurator({
           </aside>
         </section>
       </main>
+
+      {/* Sticky mobile savings + CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-3 py-2 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-[10px] font-bold uppercase tracking-wide text-cloover">
+              Est. monthly saving after loan
+            </p>
+            <p className="text-xl font-extrabold text-cloover leading-tight">
+              €<CountUp value={monthlySaving} />
+              <span className="text-xs font-bold">/mo</span>
+            </p>
+          </div>
+          <button
+            onClick={onReview}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-cloover px-4 py-2.5 text-sm font-extrabold text-white shadow hover:bg-cloover/90"
+          >
+            Review offer <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
       <SiteFooter />
     </div>
   );
