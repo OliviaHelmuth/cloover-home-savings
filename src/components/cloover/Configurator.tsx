@@ -264,7 +264,7 @@ export function Configurator({
                     draggable={!disabled}
                     onDragStart={(e) => e.dataTransfer.setData("module", option.key)}
                     onClick={() => toggleModule(option.key)}
-                    className={`group rounded-[16px] border-2 p-2 text-left transition ${
+                    className={`group shrink-0 min-w-[200px] lg:min-w-0 rounded-[16px] border-2 p-2 text-left transition ${
                       on
                         ? "border-cloover bg-cloover text-white shadow-lg shadow-cloover/20"
                         : disabled
