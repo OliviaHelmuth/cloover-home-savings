@@ -345,27 +345,27 @@ export function Configurator({
               draggingOver ? "border-cloover bg-cloover-soft/40" : "border-line"
             }`}
           >
-            <div className="mb-1 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mb-1 grid gap-2 grid-cols-2 xl:grid-cols-4">
               {transparencyChecks.map((check) => (
-                <div key={check.label} className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                <div key={check.label} className="rounded-2xl bg-white px-2.5 py-1.5 shadow-sm md:px-3 md:py-2">
                   <div className="flex items-center gap-2">
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-cloover-soft text-cloover">
-                      <check.icon className="h-4 w-4" />
+                    <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-cloover-soft text-cloover md:h-8 md:w-8">
+                      <check.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-[11px] font-bold uppercase tracking-wide text-cloover">
+                      <p className="truncate text-[10px] font-bold uppercase tracking-wide text-cloover md:text-[11px]">
                         {check.label}
                       </p>
-                      <p className="truncate text-xs font-extrabold text-ink">{check.value}</p>
+                      <p className="truncate text-[11px] font-extrabold text-ink md:text-xs">{check.value}</p>
                     </div>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-muted-foreground">
+                  <p className="mt-1 hidden line-clamp-2 text-[11px] leading-4 text-muted-foreground md:block">
                     {check.detail}
                   </p>
                 </div>
               ))}
             </div>
-            <div className="relative h-[calc(100svh-220px)] min-h-[360px] overflow-hidden rounded-[18px] bg-surface-soft">
+            <div className="relative h-[240px] sm:h-[320px] lg:h-[calc(100svh-220px)] lg:min-h-[360px] overflow-hidden rounded-[18px] bg-surface-soft">
               <div className="absolute inset-0 flex items-center justify-center">
                 <HouseScene active={active} />
               </div>
