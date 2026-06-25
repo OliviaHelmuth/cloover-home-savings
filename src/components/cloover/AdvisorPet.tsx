@@ -106,6 +106,7 @@ function playCuteSound(kind: "open" | "send" | "reply") {
 
 export function AdvisorPet({ onStart }: Props) {
   const [open, setOpen] = useState(false);
+  const [hintDismissed, setHintDismissed] = useState(false);
   const [messages, setMessages] = useState<Message[]>(starterMessages);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -165,10 +166,10 @@ export function AdvisorPet({ onStart }: Props) {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3">
+    <div className="fixed bottom-24 right-3 z-50 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-2.5 md:bottom-4 md:right-4 md:max-w-[calc(100vw-2rem)] md:gap-3">
       {open && (
-        <section className="chat-panel-smooth w-[min(410px,calc(100vw-2rem))] overflow-hidden rounded-[24px] border border-line bg-white shadow-2xl">
-          <div className="flex items-center justify-between border-b border-line bg-gradient-to-r from-white to-cloover-soft/70 px-4 py-3">
+        <section className="chat-panel-smooth flex max-h-[calc(100svh-8rem)] w-[min(410px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[20px] border border-line bg-white shadow-2xl md:max-h-[calc(100svh-6rem)] md:rounded-[24px]">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line bg-gradient-to-r from-white to-cloover-soft/70 px-3 py-2.5 md:px-4 md:py-3">
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-full bg-ink text-white shadow-lg shadow-ink/15">
                 <Bot className="h-5 w-5" />
@@ -203,7 +204,7 @@ export function AdvisorPet({ onStart }: Props) {
 
           <div
             ref={scrollRef}
-            className="max-h-[360px] space-y-3 overflow-y-auto bg-surface-soft p-4"
+            className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-surface-soft p-3 md:space-y-3 md:p-4"
           >
             {messages.map((message, index) => (
               <div
@@ -232,7 +233,7 @@ export function AdvisorPet({ onStart }: Props) {
             )}
           </div>
 
-          <div className="border-t border-line bg-white p-4">
+          <div className="shrink-0 border-t border-line bg-white p-3 md:p-4">
             <div className="mb-3 flex flex-wrap gap-2">
               {quickPrompts.map((prompt) => (
                 <button
@@ -283,18 +284,31 @@ export function AdvisorPet({ onStart }: Props) {
         </section>
       )}
 
-      {!open && latestAdvisorText && (
-        <button
-          type="button"
-          onClick={toggleOpen}
-          className="hidden max-w-[300px] rounded-2xl border border-line bg-white px-4 py-3 text-left text-sm leading-5 text-ink shadow-xl transition hover:-translate-y-0.5 hover:border-cloover md:block"
-        >
-          <span className="mb-1 flex items-center gap-2 text-xs font-bold uppercase text-cloover">
-            <Sparkles className="h-3.5 w-3.5" />
-            Advisor hint
-          </span>
-          {latestAdvisorText}
-        </button>
+      {!open && latestAdvisorText && !hintDismissed && (
+        <div className="relative hidden max-w-[300px] md:block">
+          <button
+            type="button"
+            onClick={toggleOpen}
+            className="block w-full rounded-2xl border border-line bg-white px-4 py-3 pr-9 text-left text-sm leading-5 text-ink shadow-xl transition hover:-translate-y-0.5 hover:border-cloover"
+          >
+            <span className="mb-1 flex items-center gap-2 text-xs font-bold uppercase text-cloover">
+              <Sparkles className="h-3.5 w-3.5" />
+              Advisor hint
+            </span>
+            {latestAdvisorText}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setHintDismissed(true);
+            }}
+            className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white text-muted-foreground shadow ring-1 ring-line transition hover:bg-ink hover:text-white"
+            aria-label="Dismiss advisor hint"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
       )}
 
       <button

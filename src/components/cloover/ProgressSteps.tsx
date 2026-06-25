@@ -1,9 +1,9 @@
 type StepNumber = 1 | 2 | 3;
 
-const STEPS: { number: StepNumber; label: string; description: string }[] = [
-  { number: 1, label: "Inputs", description: "Home details" },
-  { number: 2, label: "Configuration", description: "Choose upgrades" },
-  { number: 3, label: "Final proposal", description: "Review outcome" },
+const STEPS: { number: StepNumber; label: string; shortLabel: string; description: string }[] = [
+  { number: 1, label: "Inputs", shortLabel: "Inputs", description: "Home details" },
+  { number: 2, label: "Configuration", shortLabel: "Configure", description: "Choose upgrades" },
+  { number: 3, label: "Final proposal", shortLabel: "Proposal", description: "Review outcome" },
 ];
 
 export function ProgressSteps({
@@ -15,8 +15,8 @@ export function ProgressSteps({
 }) {
   return (
     <div className="border-b border-line bg-white/95 backdrop-blur">
-      <div className="mx-auto max-w-7xl px-5 py-3 md:px-6">
-        <div className="grid grid-cols-3 items-stretch gap-2 md:gap-3">
+      <div className="mx-auto max-w-7xl px-3 py-2.5 md:px-6 md:py-3">
+        <div className="grid grid-cols-3 items-stretch gap-1.5 md:gap-3">
           {STEPS.map((step, index) => {
             const isActive = step.number === activeStep;
             const isDone = step.number < activeStep;
@@ -24,7 +24,7 @@ export function ProgressSteps({
               <button
                 key={step.number}
                 onClick={() => onStepSelect?.(step.number)}
-                className={`relative flex items-center gap-2 rounded-2xl border px-3 py-2 text-left transition ${
+                className={`relative flex min-w-0 items-center gap-1.5 rounded-xl border px-2 py-1.5 text-left transition md:gap-2 md:rounded-2xl md:px-3 md:py-2 ${
                   isActive
                     ? "border-cloover bg-cloover-soft shadow-sm"
                     : "border-line bg-white hover:border-cloover/40 hover:bg-cloover-soft/40"
@@ -39,7 +39,7 @@ export function ProgressSteps({
                   />
                 )}
                 <span
-                  className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-extrabold ${
+                  className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-extrabold md:h-8 md:w-8 md:text-sm ${
                     isDone || isActive
                       ? "bg-cloover text-white"
                       : "bg-surface-soft text-muted-foreground"
@@ -47,16 +47,17 @@ export function ProgressSteps({
                 >
                   {step.number}
                 </span>
-                <span className="min-w-0">
+                <span className="min-w-0 flex-1">
                   <span
-                    className={`block truncate text-[11px] font-bold uppercase tracking-wide ${
+                    className={`hidden truncate text-[11px] font-bold uppercase tracking-wide md:block ${
                       isActive ? "text-cloover" : "text-muted-foreground"
                     }`}
                   >
                     Step {step.number}
                   </span>
-                  <span className="block truncate text-sm font-extrabold text-ink">
-                    {step.label}
+                  <span className="block truncate text-[12px] font-extrabold leading-tight text-ink md:text-sm">
+                    <span className="md:hidden">{step.shortLabel}</span>
+                    <span className="hidden md:inline">{step.label}</span>
                   </span>
                   <span className="hidden truncate text-xs text-muted-foreground sm:block">
                     {step.description}

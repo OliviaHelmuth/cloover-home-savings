@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { jsPDF } from "jspdf";
 import {
   Send,
@@ -182,9 +182,20 @@ function SpendingOverTimeChart({
   breakEvenYear: number;
   termYears: number;
 }) {
-  const width = 900;
-  const height = 360;
-  const padding = { top: 32, right: 38, bottom: 44, left: 70 };
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+  const width = isMobile ? 520 : 900;
+  const height = isMobile ? 460 : 360;
+  const padding = isMobile
+    ? { top: 28, right: 24, bottom: 40, left: 56 }
+    : { top: 32, right: 38, bottom: 44, left: 70 };
   const maxYear = 15;
   const maxMonthlySpend = Math.max(
     currentMonthlySpend,
@@ -276,7 +287,8 @@ function SpendingOverTimeChart({
               x={x(tick)}
               y={height - 15}
               textAnchor="middle"
-              className="fill-muted-foreground text-[12px] font-semibold"
+              fontSize={isMobile ? 16 : 12}
+              className="fill-muted-foreground font-semibold"
             >
               {tick}y
             </text>
@@ -296,16 +308,16 @@ function SpendingOverTimeChart({
         <circle cx={x(0)} cy={financedY} r="6" fill="#1F6FEB" />
         <circle cx={x(term)} cy={afterY} r="6" fill="#1F6FEB" />
         <circle cx={x(maxYear)} cy={afterY} r="6" fill="#1F6FEB" />
-        <text x={padding.left} y={22} className="fill-muted-foreground text-[12px] font-semibold">
+        <text x={padding.left} y={22} fontSize={isMobile ? 16 : 12} className="fill-muted-foreground font-semibold">
           monthly cost
         </text>
-        <text x={x(0) + 10} y={currentY - 10} className="fill-ink text-[13px] font-bold">
+        <text x={x(0) + 10} y={currentY - 10} fontSize={isMobile ? 18 : 13} className="fill-ink font-bold">
           €{currentMonthlySpend.toLocaleString()}/mo today
         </text>
-        <text x={x(0) + 10} y={financedY + 22} className="fill-cloover text-[13px] font-bold">
+        <text x={x(0) + 10} y={financedY + 22} fontSize={isMobile ? 18 : 13} className="fill-cloover font-bold">
           €{monthlyDuringFinancing.toLocaleString()}/mo during loan
         </text>
-        <text x={x(term) + 10} y={afterY - 12} className="fill-cloover text-[13px] font-bold">
+        <text x={x(term) + 10} y={afterY - 12} fontSize={isMobile ? 18 : 13} className="fill-cloover font-bold">
           €{modeledMonthlyBill.toLocaleString()}/mo after loan
         </text>
       </svg>
