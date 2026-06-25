@@ -372,7 +372,7 @@ export function Configurator({
             </div>
           </section>
 
-          <aside className="bg-white rounded-[22px] border border-line p-3 md:p-4 flex flex-col gap-2.5 h-fit lg:sticky lg:top-24">
+          <aside className="min-w-0 bg-white rounded-[22px] border border-line p-3 md:p-4 flex flex-col gap-2.5 h-fit lg:sticky lg:top-24">
             <div>
               <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
                 Approximate saving
