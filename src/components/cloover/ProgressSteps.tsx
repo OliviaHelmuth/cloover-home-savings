@@ -56,7 +56,8 @@ export function ProgressSteps({
                     Step {step.number}
                   </span>
                   <span className="block truncate text-[12px] font-extrabold leading-tight text-ink md:text-sm">
-                    {step.label}
+                    <span className="md:hidden">{step.shortLabel}</span>
+                    <span className="hidden md:inline">{step.label}</span>
                   </span>
                   <span className="hidden truncate text-xs text-muted-foreground sm:block">
                     {step.description}
