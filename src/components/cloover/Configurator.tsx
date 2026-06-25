@@ -196,7 +196,7 @@ export function Configurator({
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
       <main className="mx-auto max-w-[1680px] px-2 py-2 pb-24 md:px-3 lg:pb-2">
-        <section className="grid gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
+        <section className="grid grid-cols-1 gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
           <aside className="min-w-0 rounded-[22px] border border-line bg-white p-2.5 h-fit lg:sticky lg:top-24">
             <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
               Upgrade options
