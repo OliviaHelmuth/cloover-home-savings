@@ -169,7 +169,7 @@ export function AdvisorPet({ onStart }: Props) {
     <div className="fixed bottom-24 right-3 z-50 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-2.5 md:bottom-4 md:right-4 md:max-w-[calc(100vw-2rem)] md:gap-3">
       {open && (
         <section className="chat-panel-smooth flex max-h-[calc(100svh-8rem)] w-[min(410px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[20px] border border-line bg-white shadow-2xl md:max-h-[calc(100svh-6rem)] md:rounded-[24px]">
-          <div className="flex items-center justify-between border-b border-line bg-gradient-to-r from-white to-cloover-soft/70 px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line bg-gradient-to-r from-white to-cloover-soft/70 px-3 py-2.5 md:px-4 md:py-3">
             <div className="flex items-center gap-3">
               <div className="relative grid h-10 w-10 place-items-center rounded-full bg-ink text-white shadow-lg shadow-ink/15">
                 <Bot className="h-5 w-5" />
