@@ -308,16 +308,16 @@ function SpendingOverTimeChart({
         <circle cx={x(0)} cy={financedY} r="6" fill="#1F6FEB" />
         <circle cx={x(term)} cy={afterY} r="6" fill="#1F6FEB" />
         <circle cx={x(maxYear)} cy={afterY} r="6" fill="#1F6FEB" />
-        <text x={padding.left} y={22} className="fill-muted-foreground text-[12px] font-semibold">
+        <text x={padding.left} y={22} fontSize={isMobile ? 16 : 12} className="fill-muted-foreground font-semibold">
           monthly cost
         </text>
-        <text x={x(0) + 10} y={currentY - 10} className="fill-ink text-[13px] font-bold">
+        <text x={x(0) + 10} y={currentY - 10} fontSize={isMobile ? 18 : 13} className="fill-ink font-bold">
           €{currentMonthlySpend.toLocaleString()}/mo today
         </text>
-        <text x={x(0) + 10} y={financedY + 22} className="fill-cloover text-[13px] font-bold">
+        <text x={x(0) + 10} y={financedY + 22} fontSize={isMobile ? 18 : 13} className="fill-cloover font-bold">
           €{monthlyDuringFinancing.toLocaleString()}/mo during loan
         </text>
-        <text x={x(term) + 10} y={afterY - 12} className="fill-cloover text-[13px] font-bold">
+        <text x={x(term) + 10} y={afterY - 12} fontSize={isMobile ? 18 : 13} className="fill-cloover font-bold">
           €{modeledMonthlyBill.toLocaleString()}/mo after loan
         </text>
       </svg>
