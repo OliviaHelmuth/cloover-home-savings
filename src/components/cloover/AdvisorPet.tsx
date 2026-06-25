@@ -233,7 +233,7 @@ export function AdvisorPet({ onStart }: Props) {
             )}
           </div>
 
-          <div className="border-t border-line bg-white p-4">
+          <div className="shrink-0 border-t border-line bg-white p-3 md:p-4">
             <div className="mb-3 flex flex-wrap gap-2">
               {quickPrompts.map((prompt) => (
                 <button
