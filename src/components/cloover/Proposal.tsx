@@ -182,9 +182,20 @@ function SpendingOverTimeChart({
   breakEvenYear: number;
   termYears: number;
 }) {
-  const width = 900;
-  const height = 360;
-  const padding = { top: 32, right: 38, bottom: 44, left: 70 };
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+  const width = isMobile ? 520 : 900;
+  const height = isMobile ? 460 : 360;
+  const padding = isMobile
+    ? { top: 28, right: 24, bottom: 40, left: 56 }
+    : { top: 32, right: 38, bottom: 44, left: 70 };
   const maxYear = 15;
   const maxMonthlySpend = Math.max(
     currentMonthlySpend,
