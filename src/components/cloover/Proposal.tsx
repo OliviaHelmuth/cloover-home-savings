@@ -287,7 +287,8 @@ function SpendingOverTimeChart({
               x={x(tick)}
               y={height - 15}
               textAnchor="middle"
-              className="fill-muted-foreground text-[12px] font-semibold"
+              fontSize={isMobile ? 16 : 12}
+              className="fill-muted-foreground font-semibold"
             >
               {tick}y
             </text>
