@@ -341,7 +341,7 @@ export function Configurator({
                 toggleModule(k);
               }
             }}
-            className={`bg-white rounded-[24px] border-2 transition p-2 relative overflow-hidden ${
+            className={`min-w-0 bg-white rounded-[24px] border-2 transition p-2 relative overflow-hidden ${
               draggingOver ? "border-cloover bg-cloover-soft/40" : "border-line"
             }`}
           >
