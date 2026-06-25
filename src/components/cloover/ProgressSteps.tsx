@@ -1,9 +1,9 @@
 type StepNumber = 1 | 2 | 3;
 
-const STEPS: { number: StepNumber; label: string; description: string }[] = [
-  { number: 1, label: "Inputs", description: "Home details" },
-  { number: 2, label: "Configuration", description: "Choose upgrades" },
-  { number: 3, label: "Final proposal", description: "Review outcome" },
+const STEPS: { number: StepNumber; label: string; shortLabel: string; description: string }[] = [
+  { number: 1, label: "Inputs", shortLabel: "Inputs", description: "Home details" },
+  { number: 2, label: "Configuration", shortLabel: "Configure", description: "Choose upgrades" },
+  { number: 3, label: "Final proposal", shortLabel: "Proposal", description: "Review outcome" },
 ];
 
 export function ProgressSteps({
