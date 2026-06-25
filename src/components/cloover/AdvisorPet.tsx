@@ -284,18 +284,31 @@ export function AdvisorPet({ onStart }: Props) {
         </section>
       )}
 
-      {!open && latestAdvisorText && (
-        <button
-          type="button"
-          onClick={toggleOpen}
-          className="hidden max-w-[300px] rounded-2xl border border-line bg-white px-4 py-3 text-left text-sm leading-5 text-ink shadow-xl transition hover:-translate-y-0.5 hover:border-cloover md:block"
-        >
-          <span className="mb-1 flex items-center gap-2 text-xs font-bold uppercase text-cloover">
-            <Sparkles className="h-3.5 w-3.5" />
-            Advisor hint
-          </span>
-          {latestAdvisorText}
-        </button>
+      {!open && latestAdvisorText && !hintDismissed && (
+        <div className="relative hidden max-w-[300px] md:block">
+          <button
+            type="button"
+            onClick={toggleOpen}
+            className="block w-full rounded-2xl border border-line bg-white px-4 py-3 pr-9 text-left text-sm leading-5 text-ink shadow-xl transition hover:-translate-y-0.5 hover:border-cloover"
+          >
+            <span className="mb-1 flex items-center gap-2 text-xs font-bold uppercase text-cloover">
+              <Sparkles className="h-3.5 w-3.5" />
+              Advisor hint
+            </span>
+            {latestAdvisorText}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setHintDismissed(true);
+            }}
+            className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white text-muted-foreground shadow ring-1 ring-line transition hover:bg-ink hover:text-white"
+            aria-label="Dismiss advisor hint"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
       )}
 
       <button
