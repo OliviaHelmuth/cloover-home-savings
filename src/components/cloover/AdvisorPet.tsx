@@ -204,7 +204,7 @@ export function AdvisorPet({ onStart }: Props) {
 
           <div
             ref={scrollRef}
-            className="max-h-[360px] space-y-3 overflow-y-auto bg-surface-soft p-4"
+            className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-surface-soft p-3 md:space-y-3 md:p-4"
           >
             {messages.map((message, index) => (
               <div
