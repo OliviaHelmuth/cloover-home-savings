@@ -106,6 +106,7 @@ function playCuteSound(kind: "open" | "send" | "reply") {
 
 export function AdvisorPet({ onStart }: Props) {
   const [open, setOpen] = useState(false);
+  const [hintDismissed, setHintDismissed] = useState(false);
   const [messages, setMessages] = useState<Message[]>(starterMessages);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
