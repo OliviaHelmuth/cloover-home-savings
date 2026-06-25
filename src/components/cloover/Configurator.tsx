@@ -196,8 +196,8 @@ export function Configurator({
       <ProgressSteps activeStep={2} onStepSelect={onStepSelect} />
 
       <main className="mx-auto max-w-[1680px] px-2 py-2 pb-24 md:px-3 lg:pb-2">
-        <section className="grid gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
-          <aside className="rounded-[22px] border border-line bg-white p-2.5 h-fit lg:sticky lg:top-24">
+        <section className="grid grid-cols-1 gap-3 lg:grid-cols-[250px_minmax(0,1fr)_270px] xl:grid-cols-[270px_minmax(0,1fr)_290px]">
+          <aside className="min-w-0 rounded-[22px] border border-line bg-white p-2.5 h-fit lg:sticky lg:top-24">
             <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
               Upgrade options
             </p>
@@ -341,7 +341,7 @@ export function Configurator({
                 toggleModule(k);
               }
             }}
-            className={`bg-white rounded-[24px] border-2 transition p-2 relative overflow-hidden ${
+            className={`min-w-0 bg-white rounded-[24px] border-2 transition p-2 relative overflow-hidden ${
               draggingOver ? "border-cloover bg-cloover-soft/40" : "border-line"
             }`}
           >
@@ -372,7 +372,7 @@ export function Configurator({
             </div>
           </section>
 
-          <aside className="bg-white rounded-[22px] border border-line p-3 md:p-4 flex flex-col gap-2.5 h-fit lg:sticky lg:top-24">
+          <aside className="min-w-0 bg-white rounded-[22px] border border-line p-3 md:p-4 flex flex-col gap-2.5 h-fit lg:sticky lg:top-24">
             <div>
               <p className="text-xs font-semibold text-cloover uppercase tracking-wide">
                 Approximate saving
